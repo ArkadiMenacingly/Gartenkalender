@@ -115,8 +115,19 @@ details.plant summary::-webkit-details-marker{display:none}
 footer{font-size:13px;color:var(--muted)}
 .pic{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;display:block;background:var(--pic-bg)}
 .pic svg,.pic img{width:100%;height:100%;display:block;object-fit:cover}
-.task{grid-template-columns:auto auto 1fr}
+.task{grid-template-columns:auto 1fr;cursor:default}
 .task .pic{width:40px;height:40px}
+.task .chk{display:flex;padding:12px;margin:-12px;cursor:pointer}
+.task .open{font:inherit;color:inherit;text-align:left;background:none;border:0;padding:0;margin:0;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;cursor:pointer;min-width:0;width:100%}
+.task .more{display:block;font-size:13px;color:var(--accent);font-weight:600;margin-top:4px}
+.task.done .more{text-decoration:none}
+button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
+.sheet[hidden]{display:none!important}
+.sheet{position:fixed;inset:0;background:rgba(10,16,12,.5);z-index:30;display:flex;align-items:flex-end;justify-content:center}
+.sheet-card{background:var(--surface);color:var(--ink);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;border-radius:18px 18px 0 0;display:flex;flex-direction:column;gap:14px;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;position:sticky;top:-16px;background:var(--surface);padding-block:4px;z-index:1}
+@media (min-width:700px){.sheet{align-items:center}.sheet-card{border-radius:18px;max-height:85vh}}
 .ph{display:flex;align-items:center;gap:12px;min-width:0}
 .ph .pic{width:52px;height:52px}
 .photo-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -161,6 +172,8 @@ footer{font-size:13px;color:var(--muted)}
     <div class="legend" id="legend"></div>
     <div class="plist" id="plist"></div>
   </section>
+
+  <div class="sheet" id="sheet" hidden><div class="sheet-card" role="dialog" aria-modal="true" aria-label="Jahresübersicht"><div class="sheet-head"><span class="eyebrow">Jahresübersicht</span><button type="button" class="btn" id="sheetClose">Schliessen</button></div><div id="sheetBody" class="pbody" style="border:0;padding:0"></div></div></div>
 
   <footer>Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert.</footer>
 </div>
@@ -357,7 +370,7 @@ const PIC={hortensie:ball(),hib:hib("#FFFFFF","#B0284A"),rose:rose("#D9416A","#8
 /* ---- Zustand ---- */
 const CATS=["Sträucher","Rosen","Beeren","Palmen & Exoten","Stauden","Sommerblumen","Allgemein"];
 const now=new Date(); const CUR=now.getMonth()+1; const YEAR=now.getFullYear();
-let month=CUR, view="month", cat="Alle", openId=null;
+let month=CUR, view="month", cat="Alle", openId=null, sheetId=null;
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true}catch(e){return false}}};
 if(store.get("gk-view")==="plants") view="plants";
 const sc=store.get("gk-cat"); if(sc&&(sc==="Alle"||CATS.includes(sc))) cat=sc;
@@ -387,7 +400,7 @@ function renderMonth(){
   const ts=tasksFor(month);
   $("title").textContent=MON[month-1];
   const blooming=PLANTS.filter(p=>p.bloom.includes(month));
-  $("bloom").innerHTML=`<span class="lbl">Blüht jetzt</span>`+(blooming.length?blooming.map(p=>`<span class="chip">${esc(label(p))}</span>`).join(""):`<span style="color:var(--muted)">nichts – Ruhezeit</span>`);
+  $("bloom").innerHTML=`<span class="lbl">Blüht jetzt</span>`+(blooming.length?blooming.map(p=>`<button type="button" class="chip" data-open="${p.id}">${esc(label(p))}</button>`).join(""):`<span style="color:var(--muted)">nichts – Ruhezeit</span>`);
   const done=ts.filter(t=>store.get(t.key)).length;
   $("sub").textContent=`${ts.length} Aufgaben in diesem Monat`;
   $("progTxt").textContent=`${done} von ${ts.length} erledigt`;
@@ -396,7 +409,7 @@ function renderMonth(){
   $("groups").innerHTML=ORDER.filter(t=>ts.some(x=>x.type===t)).map(t=>{
     const list=ts.filter(x=>x.type===t);
     return `<div class="group" style="--tc:${tc(t)}"><h2><span class="dot"></span>${TYPES[t].n} <small>${list.length}</small></h2>`+
-      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}>${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span>${x.p.sorte?`<br><span class="sorte">${esc(x.p.sorte)}</span>`:""}<br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
+      list.map(x=>{const d=!!store.get(x.key);return `<div class="task${d?' done':''}"><label class="chk" title="Erledigt"><input type="checkbox" id="${x.key}" data-k="${x.key}" aria-label="Erledigt: ${esc(label(x.p))}"${d?' checked':''}></label><button type="button" class="open" data-open="${x.p.id}">${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span>${x.p.sorte?`<br><span class="sorte">${esc(x.p.sorte)}</span>`:""}<br><span class="what">${esc(x.text)}</span><span class="more">Jahresübersicht ›</span></span></button></div>`}).join("")+`</div>`;
   }).join("");
 }
 function yearRows(p){
@@ -408,6 +421,18 @@ function yearRows(p){
   }
   return rows.join("");
 }
+function plantDetail(p,pre){
+  const has=!!photo(p.id);
+  return `<div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="${pre}-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="${pre}-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
+      <h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul>`;
+}
+function openSheet(id){
+  const p=PLANTS.find(x=>x.id===id); if(!p) return;
+  sheetId=id;
+  $("sheetBody").innerHTML=`<div class="ph"><div style="min-width:0"><div class="pname" style="font-size:18px">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.sorte?`<div class="pbot">${esc(p.sorte)}</div>`:""}</div></div>`+plantDetail(p,"sh");
+  $("sheet").hidden=false; document.body.style.overflow="hidden"; $("sheetClose").focus();
+}
+function closeSheet(){ $("sheet").hidden=true; sheetId=null; document.body.style.overflow=""; }
 function renderPlants(){
   $("title").textContent="Meine Pflanzen";
   $("sub").textContent="Pflanzenart wählen, dann Pflanze antippen für die Jahresübersicht";
@@ -423,8 +448,7 @@ function renderPlants(){
       return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===CUR?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
     const has=!!photo(p.id);
     return head+`<details class="plant" data-id="${p.id}"${p.id===openId?' open':''}><summary><div class="ph">${picHTML(p)}<div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.sorte?`<div class="pbot">${esc(p.sorte)}</div>`:""}</div></div><div class="year">${year}</div></summary>
-      <div class="pbody"><div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="ph-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="ph-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
-      <h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul></div></details>`;
+      <div class="pbody">${plantDetail(p,"ph")}</div></details>`;
   }).join("");
 }
 function render(){
@@ -439,12 +463,17 @@ function addPhoto(id,file){
   const url=URL.createObjectURL(file), img=new Image();
   img.onload=()=>{const s=320,c=document.createElement("canvas");c.width=c.height=s;const m=Math.min(img.naturalWidth,img.naturalHeight);
     c.getContext("2d").drawImage(img,(img.naturalWidth-m)/2,(img.naturalHeight-m)/2,m,m,0,0,s,s);URL.revokeObjectURL(url);
-    const ok=store.set("gk-photo-"+id,c.toDataURL("image/jpeg",.8));openId=id;render();
+    const ok=store.set("gk-photo-"+id,c.toDataURL("image/jpeg",.8));openId=id;render();if(sheetId)openSheet(sheetId);
     if(!ok){const d=document.querySelector(`details[data-id="${id}"] .photo-actions`);if(d)d.insertAdjacentHTML("beforeend",'<span style="color:var(--c-k)">Foto konnte nicht gespeichert werden (Speicher voll oder privates Fenster).</span>')}};
   img.onerror=()=>URL.revokeObjectURL(url);
   img.src=url;
 }
 $("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;month=+b.dataset.m;render()});
+document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o){e.preventDefault();openSheet(o.dataset.open)}});
+$("sheet").addEventListener("click",e=>{if(e.target.id==="sheet")closeSheet();const b=e.target.closest("[data-rm]");if(b){e.preventDefault();store.set("gk-photo-"+b.dataset.rm,"");render();openSheet(b.dataset.rm)}});
+$("sheet").addEventListener("change",e=>{const id=e.target.dataset.photo;if(id&&e.target.files[0])addPhoto(id,e.target.files[0])});
+$("sheetClose").onclick=closeSheet;
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheetId)closeSheet()});
 $("groups").addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;store.set(k,e.target.checked?"1":"");renderMonths();renderMonth()});
 $("filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.cat;store.set("gk-cat",cat);openId=null;renderPlants()});
 $("plist").addEventListener("toggle",e=>{const d=e.target;if(d.tagName!=="DETAILS")return;if(d.open)openId=d.dataset.id;else if(openId===d.dataset.id)openId=null},true);
