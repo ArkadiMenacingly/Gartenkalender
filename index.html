@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#EEF1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F0F6EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#141A16" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
@@ -19,26 +19,27 @@
 <style>
 /* Layout: ein Gartenjournal – grosser Monatsname, Monatsleiste, Aufgaben nach Arbeitsgang gruppiert; zweite Ansicht = Jahresstreifen pro Pflanze */
 :root{
-  --bg:#EEF1EA; --surface:#FFFFFF; --ink:#1E2A21; --muted:#5D6A5F; --line:#D5DCD0;
-  --accent:#4E46A8; --accent-soft:#E6E4F6; --bloom:#D9579A; --bloom-soft:#F7DDEA;
-  --c-s:#B4532F; --c-d:#3D7A33; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A;
+  --bg:#F0F6EF; --surface:#FFFFFF; --ink:#16261B; --muted:#5D6A5F; --line:#D5DCD0;
+  --accent:#178A3E; --accent-soft:#DFF2E3; --bloom:#D9579A; --bloom-soft:#F7DDEA;
+  --c-s:#B4532F; --c-d:#7350C0; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A;
   --pic-bg:#DDE5D6; --leaf:#5E9A4E;
   --display:"Young Serif", Georgia, "Times New Roman", serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
-  --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
-  --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --accent:#5FD38A; --accent-soft:#183A23; --bloom:#F08CBF; --bloom-soft:#43243A;
+  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
   --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
-  --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
-  --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --accent:#5FD38A; --accent-soft:#183A23; --bloom:#F08CBF; --bloom-soft:#43243A;
+  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
   --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
 .wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
@@ -47,6 +48,7 @@ header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:fle
 h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,9vw,64px);line-height:1;margin:4px 0 0;text-wrap:balance}
 .sub{color:var(--muted);margin-top:6px}
 .views{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.views{flex-wrap:wrap}
 .views button{font:inherit;font-weight:600;border:0;background:none;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer}
 .views button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
 .months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;overflow-x:auto}
@@ -112,6 +114,25 @@ details.plant summary::-webkit-details-marker{display:none}
 .filters{display:flex;flex-wrap:wrap;gap:6px}
 .filters .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
 .filters .fc{font-weight:500;opacity:.7;font-variant-numeric:tabular-nums}
+.intro{color:var(--muted);margin:0;max-width:65ch}
+.dlist{display:flex;flex-direction:column;gap:8px}
+details.dis{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.pbody details.dis{background:var(--bg)}
+details.dis summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+details.dis summary::-webkit-details-marker{display:none}
+details.dis summary::after{content:"+";margin-left:auto;font-size:18px;color:var(--accent);font-weight:600;line-height:1}
+details.dis[open] summary::after{content:"–"}
+.dn{font-weight:600}
+.dt{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--c-k);font-weight:700}
+.dcount{font-size:13px;color:var(--muted)}
+.dbody{padding:0 14px 14px;display:grid;gap:12px}
+.dsec h4{margin:0 0 2px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.dsec p{margin:0;font-size:14px;max-width:70ch}
+.dsec.act{background:var(--accent-soft);border-radius:8px;padding:10px 12px}
+.dsec.act h4{color:var(--accent)}
+.dplants{display:flex;flex-wrap:wrap;gap:6px}
+.chip.g{background:var(--accent-soft)}
+.chip.g::before{background:var(--accent)}
 footer{font-size:13px;color:var(--muted)}
 .pic{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;display:block;background:var(--pic-bg)}
 .pic svg,.pic img{width:100%;height:100%;display:block;object-fit:cover}
@@ -156,6 +177,7 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
     <div class="views" role="group" aria-label="Ansicht">
       <button id="vMonth" aria-pressed="true">Monat</button>
       <button id="vPlants" aria-pressed="false">Pflanzen</button>
+      <button id="vDis" aria-pressed="false">Krankheiten</button>
     </div>
   </header>
 
@@ -173,7 +195,12 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
     <div class="plist" id="plist"></div>
   </section>
 
-  <div class="sheet" id="sheet" hidden><div class="sheet-card" role="dialog" aria-modal="true" aria-label="Jahresübersicht"><div class="sheet-head"><span class="eyebrow">Jahresübersicht</span><button type="button" class="btn" id="sheetClose">Schliessen</button></div><div id="sheetBody" class="pbody" style="border:0;padding:0"></div></div></div>
+  <section id="disView" hidden class="wrap" style="gap:10px">
+    <p class="intro">Alle Krankheiten und Schädlinge, die bei deinen Pflanzen häufig vorkommen. Tippe auf einen Eintrag für Erkennen, Vorbeugen und Behandeln, oder auf eine Pflanze für ihre Jahresübersicht.</p>
+    <div class="dlist" id="dlist"></div>
+  </section>
+
+  <div class="sheet" id="sheet" hidden><div class="sheet-card" role="dialog" aria-modal="true" aria-label="Jahresübersicht"><div class="sheet-head"><span class="eyebrow">Pflanze</span><button type="button" class="btn" id="sheetClose">Schliessen</button></div><div id="sheetBody" class="pbody" style="border:0;padding:0"></div></div></div>
 
   <footer>Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert.</footer>
 </div>
@@ -342,6 +369,109 @@ const PLANTS=[
   [[10,11],"w","Laub sammeln. Es ist der beste Winterschutz für Bananen, Palmen und Rosen."]]}
 ];
 
+/* ---- Krankheiten & Schädlinge ---- */
+const DIS={
+ mehltau:{n:"Echter Mehltau",t:"Pilz",
+  erk:"Weisser, mehlartiger Belag auf den Blättern, der sich abwischen lässt. Später werden die Blätter braun und vertrocknen. Er tritt vor allem im Spätsommer und Herbst auf, wenn auf warme, trockene Tage kühle, taufeuchte Nächte folgen. Typisch bei Phlox und Herbstastern.",
+  vor:"Luftig pflanzen und dichte Horste ausdünnen. Morgens direkt an die Wurzel giessen, nie über die Blätter. Trockenstress vermeiden, denn geschwächte Pflanzen werden zuerst befallen. Nicht zu viel Stickstoff düngen. Beim Neukauf mehltautolerante Sorten wählen.",
+  beh:"Befallene Blätter und Triebe sofort entfernen und in den Hausmüll geben. Bei beginnendem Befall Milch und Wasser im Verhältnis 1:8 alle 3–4 Tage auf die Blätter sprühen. Bei starkem Befall ein Mittel auf Schwefelbasis (Netzschwefel) aus dem Gartencenter nach Packungsanleitung. Ab Oktober lohnt sich Spritzen nicht mehr: Die Pflanze bodennah zurückschneiden und das Laub nicht kompostieren."},
+ sternrusstau:{n:"Sternrusstau",t:"Pilz",
+  erk:"Schwarz-violette Flecken mit sternförmig ausfransendem Rand, meist ab Juni. Die Blätter werden gelb und fallen ab, die Rose verkahlt von unten.",
+  vor:"Robuste Sorten (ADR-Rosen) wählen. Sonniger, luftiger Standort, nie über die Blätter giessen. Im Herbst und Frühling alles Falllaub entfernen, denn dort überwintert der Pilz. Ackerschachtelhalm-Brühe ab dem Austrieb stärkt die Blätter.",
+  beh:"Befallene Blätter abzupfen und aufgesammeltes Laub in den Hausmüll geben. Bei starkem Befall ein Rosen-Pilzmittel nach Packungsanleitung spritzen, am besten schon beim ersten Auftreten."},
+ rost:{n:"Rostpilz",t:"Pilz",
+  erk:"Gelbliche Flecken auf der Blattoberseite, darunter orange bis braune Pusteln auf der Blattunterseite. Später werden die Pusteln dunkel.",
+  vor:"Nicht über die Blätter giessen, luftig pflanzen, Falllaub entfernen. Ausgewogen düngen: Kalium stärkt die Blätter, zu viel Stickstoff macht sie anfällig.",
+  beh:"Befallene Blätter sofort entfernen und in den Hausmüll geben. Bei Stauden mit starkem Befall die ganze Pflanze bodennah zurückschneiden, sie treibt meist gesund nach. Bei Rosen notfalls ein Mittel gegen Rostpilze nach Anleitung."},
+ blattlaus:{n:"Blattläuse",t:"Schädling",
+  erk:"Kolonien kleiner grüner, schwarzer oder roter Läuse an Triebspitzen und Knospen. Die Blätter kräuseln sich und sind klebrig (Honigtau), oft laufen Ameisen dazwischen.",
+  vor:"Nützlinge wie Marienkäfer, Florfliegen, Schwebfliegen und Vögel fördern. Nicht zu stickstoffbetont düngen. Triebspitzen im Frühling regelmässig kontrollieren.",
+  beh:"Bei wenigen Läusen abstreifen oder mit einem kräftigen Wasserstrahl abspritzen. Bei starkem Befall Kaliseife (Schmierseifen-Lösung) oder ein Mittel auf Rapsölbasis sprühen, die Blattunterseiten nicht vergessen. Nach einer Woche wiederholen."},
+ schnecken:{n:"Schnecken",t:"Schädling",
+  erk:"Löcher und Frassspuren an jungen Blättern, glänzende Schleimspuren. Besonders der Austrieb im Frühling wird oft ganz abgefressen.",
+  vor:"Morgens statt abends giessen. Schneckenkragen um junge Pflanzen setzen. Keine Verstecke wie Bretter oder dichtes, nasses Laub direkt bei den Pflanzen. Abends und nach Regen kontrollieren.",
+  beh:"Schnecken abends oder frühmorgens absammeln. Schneckenkorn auf Basis von Eisen-III-Phosphat sparsam und gleichmässig streuen, nicht als Häufchen."},
+ faeule:{n:"Wurzel- und Stängelfäule",t:"Pilz / Staunässe",
+  erk:"Die Pflanze welkt, obwohl der Boden feucht ist. Der Stängelgrund wird braun und weich, im Frühling treibt die Pflanze nicht mehr aus.",
+  vor:"Für durchlässigen Boden sorgen (Sand oder feinen Kies einarbeiten), nicht zu tief pflanzen. Staunässe im Winter vermeiden und kein nasses Laub auf den Pflanzen liegen lassen.",
+  beh:"Faule Teile grosszügig wegschneiden und gesunde Teile in frische, durchlässige Erde setzen. Ist der Wurzelstock ganz weich, die Pflanze entsorgen."},
+ spinnmilben:{n:"Spinnmilben",t:"Schädling",
+  erk:"Die Blätter sind fein hell gesprenkelt und werden später gelblich-grau. Bei starkem Befall feine Gespinste auf den Blattunterseiten. Typisch bei Hitze und trockener Luft.",
+  vor:"Bei Hitze die Blätter ab und zu abbrausen. Pflanzen nicht direkt an heisse, windstille Mauern stellen.",
+  beh:"Blätter gründlich abbrausen, auch die Unterseiten. Bei starkem Befall Raubmilben als Nützlinge einsetzen oder ein Mittel auf Rapsölbasis sprühen."},
+ schildlaus:{n:"Schildläuse",t:"Schädling",
+  erk:"Kleine braune oder weissliche Höcker an Blattunterseiten und Stielen, die sich abkratzen lassen. Klebriger Belag, oft mit schwarzem Russtau.",
+  vor:"Vor allem nach dem Winter regelmässig kontrollieren. Gestresste Pflanzen (Trockenheit, zu dunkel) werden eher befallen.",
+  beh:"Läuse mit einer alten Zahnbürste oder einem Wattestäbchen abstreifen. Bei stärkerem Befall ein Mittel auf Paraffin- oder Rapsölbasis spritzen, das die Läuse erstickt. Nach zwei Wochen wiederholen."},
+ herzfaeule:{n:"Herzfäule",t:"Pilz / Nässe",
+  erk:"Die jüngsten Wedel in der Mitte werden braun, lassen sich leicht herausziehen und riechen faulig. Meist nach einem nassen Winter.",
+  vor:"Im Winter kein Wasser im Herz stehen lassen: Wedel locker zusammenbinden, bei Dauerregen von oben abdecken, Vlies statt Plastikfolie verwenden. Staunässe im Boden vermeiden.",
+  beh:"Faule Teile vorsichtig entfernen und das Herz austrocknen lassen. Bei Bedarf ein Pilzmittel aus dem Fachhandel einsetzen. Ist der Vegetationspunkt in der Mitte zerstört, treibt die Palme leider nicht mehr aus."},
+ braunspitzen:{n:"Braune Blattspitzen",t:"Pflegefehler",
+  erk:"Die Spitzen der Wedel werden braun und trocken.",
+  vor:"Bei Trockenheit giessen. Im Winter vor Frost und austrocknendem Wind schützen.",
+  beh:"Unschön, aber harmlos. Braune Spitzen schräg abschneiden, ohne ins Grüne zu schneiden. Ganz braune Wedel erst im Frühling entfernen, sie schützen im Winter das Herz."},
+ stammfaeule:{n:"Fäulnis im Winterschutz",t:"Nässe",
+  erk:"Der eingepackte Scheinstamm wird weich, matschig und riecht faulig.",
+  vor:"Den Winterschutz trocken halten: oben gegen Regen abdecken, an milden Tagen lüften, keine dichte Plastikfolie verwenden.",
+  beh:"Faule Teile bis ins gesunde Gewebe abschneiden. Auch wenn der Stamm verloren ist, treibt der Wurzelstock meist im Mai wieder aus."},
+ blattrisse:{n:"Eingerissene Blätter",t:"Wind",
+  erk:"Die grossen Blätter reissen quer zur Mittelrippe ein.",
+  vor:"Windgeschützter Standort.",
+  beh:"Das ist normal und schadet der Pflanze nicht. Stark zerfetzte Blätter kann man abschneiden."},
+ knospenfall:{n:"Knospenfall",t:"Pflegefehler",
+  erk:"Knospen werden gelb und fallen ungeöffnet ab.",
+  vor:"Bei Trockenheit regelmässig giessen, besonders im Juli und August. Nicht im Sommer verpflanzen.",
+  beh:"Gleichmässig feucht halten, dann setzt er neue Knospen an. Eine Krankheit steckt meist nicht dahinter."},
+ chlorose:{n:"Gelbe Blätter (Chlorose)",t:"Nährstoffmangel",
+  erk:"Die Blätter werden hellgrün bis gelb, die Blattadern bleiben grün.",
+  vor:"Regelmässig mit Kompost düngen, kalkhaltigen Boden nicht zusätzlich kalken.",
+  beh:"Einen Eisendünger oder einen Dünger mit Spurenelementen geben."},
+ blasenlaus:{n:"Johannisbeer-Blasenlaus",t:"Schädling",
+  erk:"Rote oder gelbliche Beulen (Blasen) auf den Blättern, auf der Unterseite sitzen die Läuse. Vor allem an Triebspitzen im Mai und Juni.",
+  vor:"Nützlinge fördern und die Triebspitzen im Frühling kontrollieren.",
+  beh:"Befallene Blätter und Triebspitzen abschneiden. Der Schaden ist vor allem optisch, die Beeren bleiben essbar. Spritzen ist meist nicht nötig."},
+ blattfall:{n:"Blattfallkrankheit",t:"Pilz",
+  erk:"Kleine braune Flecken auf den Blättern, ab Juli fallen die Blätter vorzeitig ab.",
+  vor:"Luftig schneiden, Falllaub im Herbst entfernen, nicht über die Blätter giessen.",
+  beh:"Befallenes Laub aufsammeln und entsorgen. Im nächsten Jahr den Strauch stärker auslichten."},
+ grauschimmel:{n:"Grauschimmel",t:"Pilz",
+  erk:"Grauer, staubender Pilzrasen auf Blüten, Blättern oder Stängeln, vor allem bei feucht-kühlem Wetter.",
+  vor:"Luftig pflanzen, nicht über Blüten und Blätter giessen, Verblühtes regelmässig entfernen.",
+  beh:"Befallene Teile grosszügig wegschneiden und in den Hausmüll geben."},
+ blattaelchen:{n:"Blattälchen",t:"Fadenwürmer",
+  erk:"Keilförmige, braun-schwarze Flecken zwischen den Blattadern, die sich von unten nach oben ausbreiten.",
+  vor:"Nicht über die Blätter giessen, denn die Älchen wandern im Wasserfilm. Pflanzen alle paar Jahre teilen und nur gesunde Teile weiterverwenden.",
+  beh:"Befallene Blätter und Triebe sofort entfernen. Stark befallene Pflanzen ganz entsorgen, nicht kompostieren."},
+ stengelaelchen:{n:"Stängelälchen",t:"Fadenwürmer",
+  erk:"Stängel verdickt, verkrümmt und brüchig. Die oberen Blätter sind fadenförmig schmal und gekräuselt.",
+  vor:"Nur gesunde Pflanzen kaufen und Phlox nicht immer an dieselbe Stelle pflanzen.",
+  beh:"Befallene Pflanzen mit Wurzelballen ausgraben und in den Hausmüll geben. Mindestens drei Jahre keinen Phlox mehr an diese Stelle pflanzen. Gesunde Pflanzen lassen sich über Wurzelschnittlinge retten, weil die Älchen nicht in die Wurzeln gehen."},
+ welke:{n:"Asternwelke",t:"Pilz",
+  erk:"Einzelne Triebe welken plötzlich von unten her, obwohl genug Wasser da ist. Der Stängelgrund ist dunkel verfärbt.",
+  vor:"Nicht zu dicht pflanzen, Staunässe vermeiden, alle 3–4 Jahre teilen und an einen neuen Platz setzen.",
+  beh:"Befallene Triebe bis zum Boden abschneiden. Bei starkem Befall die ganze Pflanze mit Wurzelballen entsorgen, nicht kompostieren, und an dieser Stelle keine Astern mehr pflanzen."},
+ vergruenung:{n:"Vergrünung (Phytoplasmen)",t:"Bakterien",
+  erk:"Die Blüten bleiben grün, sind verkrüppelt oder bilden kleine Blättchen statt Blütenblättern.",
+  vor:"Übertragen wird die Krankheit von Zikaden. Ein vielfältiger Garten mit vielen Nützlingen hält sie in Schach.",
+  beh:"Nicht heilbar. Befallene Pflanzen sofort ganz ausgraben und in den Hausmüll geben, damit sich die Krankheit nicht ausbreitet."},
+ wuehlmaus:{n:"Wühlmäuse",t:"Schädling",
+  erk:"Die Pflanze kippt plötzlich um oder treibt nicht mehr aus, die Knollen sind angefressen. Im Beet gibt es Erdhaufen und Gänge.",
+  vor:"Knollen in Pflanzkörbe aus Drahtgeflecht setzen.",
+  beh:"Wühlmausfallen aufstellen oder einen Fachbetrieb beiziehen. Angefressene Knollen ersetzen."}
+};
+const PDIS={hortensie:["mehltau","blattlaus","grauschimmel"],hib:["blattlaus","knospenfall","chlorose"],rose:["sternrusstau","mehltau","rost","blattlaus"],johb:["blasenlaus","mehltau","blattfall"],
+ musa:["stammfaeule","spinnmilben","blattrisse"],cham:["herzfaeule","schildlaus","spinnmilben","braunspitzen"],trachy:["herzfaeule","schildlaus","braunspitzen"],
+ echi:["mehltau","schnecken","faeule","vergruenung"],geranium:["mehltau","rost"],alpenaster:["mehltau","schnecken","faeule"],glocke:["rost","schnecken","mehltau"],
+ helenium:["mehltau","blattaelchen","schnecken"],phlox:["mehltau","stengelaelchen"],liatris:["wuehlmaus","schnecken","faeule"],stachys:["mehltau","faeule"],
+ herbstaster:["mehltau","welke","blattlaus"],gaura:["faeule","blattlaus"],heliopsis:["blattlaus","mehltau","schnecken"],catharanthus:["faeule","spinnmilben","blattlaus"],celosia:["schnecken","grauschimmel","spinnmilben"]};
+function disHTML(k,withPlants){
+  const d=DIS[k], who=PLANTS.filter(p=>(PDIS[p.id]||[]).includes(k));
+  return `<details class="dis"><summary><span class="dn">${d.n}</span><span class="dt">${d.t}</span>${withPlants?`<span class="dcount">${who.length} ${who.length===1?"Pflanze":"Pflanzen"}</span>`:""}</summary><div class="dbody">
+   ${withPlants?`<div class="dplants">${who.map(p=>`<button type="button" class="chip g" data-open="${p.id}">${esc(p.name)}</button>`).join("")}</div>`:""}
+   <div class="dsec"><h4>Erkennen</h4><p>${d.erk}</p></div><div class="dsec"><h4>Vorbeugen</h4><p>${d.vor}</p></div><div class="dsec act"><h4>Wenn es da ist</h4><p>${d.beh}</p></div></div></details>`;
+}
+
 /* ---- Illustrationen ---- */
 const G="var(--leaf)", SH="rgba(0,0,0,.14)";
 const W=s=>`<svg viewBox="0 0 64 64" aria-hidden="true">${s}</svg>`;
@@ -372,7 +502,7 @@ const CATS=["Sträucher","Rosen","Beeren","Palmen & Exoten","Stauden","Sommerblu
 const now=new Date(); const CUR=now.getMonth()+1; const YEAR=now.getFullYear();
 let month=CUR, view="month", cat="Alle", openId=null, sheetId=null;
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true}catch(e){return false}}};
-if(store.get("gk-view")==="plants") view="plants";
+{const v=store.get("gk-view"); if(v==="plants"||v==="dis") view=v;}
 const sc=store.get("gk-cat"); if(sc&&(sc==="Alle"||CATS.includes(sc))) cat=sc;
 const $=id=>document.getElementById(id);
 const tc=t=>`var(${TYPES[t].c})`;
@@ -424,7 +554,7 @@ function yearRows(p){
 function plantDetail(p,pre){
   const has=!!photo(p.id);
   return `<div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="${pre}-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="${pre}-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
-      <h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul>`;
+      ${(PDIS[p.id]||[]).length?`<h3>Häufige Krankheiten &amp; Schädlinge</h3><div class="dlist">${PDIS[p.id].map(k=>disHTML(k,false)).join("")}</div>`:""}<h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul>`;
 }
 function openSheet(id){
   const p=PLANTS.find(x=>x.id===id); if(!p) return;
@@ -451,13 +581,20 @@ function renderPlants(){
       <div class="pbody">${plantDetail(p,"ph")}</div></details>`;
   }).join("");
 }
+function renderDis(){
+  $("title").textContent="Krankheiten";
+  $("sub").textContent="Pilze und Schädlinge erkennen und richtig behandeln";
+  const keys=Object.keys(DIS).map(k=>[k,PLANTS.filter(p=>(PDIS[p.id]||[]).includes(k)).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
+  $("dlist").innerHTML=keys.map(([k])=>disHTML(k,true)).join("");
+}
 function render(){
   $("vMonth").setAttribute("aria-pressed",view==="month");
   $("vPlants").setAttribute("aria-pressed",view==="plants");
-  $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants";
+  $("vDis").setAttribute("aria-pressed",view==="dis");
+  $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants"; $("disView").hidden=view!=="dis";
   $("months").hidden=view!=="month";
   renderMonths();
-  view==="month"?renderMonth():renderPlants();
+  view==="month"?renderMonth():view==="plants"?renderPlants():renderDis();
 }
 function addPhoto(id,file){
   const url=URL.createObjectURL(file), img=new Image();
@@ -481,6 +618,7 @@ $("plist").addEventListener("change",e=>{const id=e.target.dataset.photo;if(id&&
 $("plist").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;e.preventDefault();store.set("gk-photo-"+b.dataset.rm,"");openId=b.dataset.rm;render()});
 $("vMonth").onclick=()=>{view="month";store.set("gk-view","month");render()};
 $("vPlants").onclick=()=>{view="plants";store.set("gk-view","plants");render()};
+$("vDis").onclick=()=>{view="dis";store.set("gk-view","dis");render()};
 $("plantTotal").textContent=PLANTS.reduce((a,p)=>a+(p.n||0),0)+"+";
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
