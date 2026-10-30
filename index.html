@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EEF1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141A16" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Garten">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<title>Mein Gartenkalender</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: ein Gartenjournal – grosser Monatsname, Monatsleiste, Aufgaben nach Arbeitsgang gruppiert; zweite Ansicht = Jahresstreifen pro Pflanze */
+:root{
+  --bg:#EEF1EA; --surface:#FFFFFF; --ink:#1E2A21; --muted:#5D6A5F; --line:#D5DCD0;
+  --accent:#4E46A8; --accent-soft:#E6E4F6; --bloom:#D9579A; --bloom-soft:#F7DDEA;
+  --c-s:#B4532F; --c-d:#3D7A33; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A;
+  --display:"Young Serif", Georgia, "Times New Roman", serif;
+  --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
+  --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
+  --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
+  --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
+  --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(40px,9vw,64px);line-height:1;margin:4px 0 0;text-wrap:balance}
+.sub{color:var(--muted);margin-top:6px}
+.views{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px}
+.views button{font:inherit;font-weight:600;border:0;background:none;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer}
+.views button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;overflow-x:auto}
+.months button{font:inherit;font-size:13px;font-weight:600;border:1px solid transparent;background:none;color:var(--muted);
+  padding:8px 0 6px;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:40px}
+.months button:hover{background:var(--surface)}
+.months button[aria-pressed="true"]{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.months .bar{width:70%;height:4px;border-radius:2px;background:var(--line);position:relative;overflow:hidden}
+.months .bar i{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:2px}
+.months .now{font-size:10px;color:var(--accent);line-height:1}
+button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bloomrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.bloomrow .lbl{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-right:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:13px;background:var(--bloom-soft);color:var(--ink)}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--bloom)}
+.progress{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:14px;font-variant-numeric:tabular-nums}
+.progress .track{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress .track i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.group{display:flex;flex-direction:column;gap:8px}
+.group h2{font-family:var(--display);font-weight:400;font-size:22px;margin:0;display:flex;align-items:center;gap:10px}
+.group h2 .dot{width:12px;height:12px;border-radius:3px;background:var(--tc)}
+.group h2 small{font-family:var(--body);font-size:13px;color:var(--muted)}
+.task{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;background:var(--surface);border:1px solid var(--line);
+  border-left:4px solid var(--tc);border-radius:10px;padding:12px 14px;cursor:pointer}
+.task input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--tc);cursor:pointer}
+.task .who{font-weight:600}
+.task .who span{color:var(--muted);font-weight:500}
+.task .txt{min-width:0}
+.task.done{opacity:.55}
+.task.done .what{text-decoration:line-through}
+.empty{color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:10px;padding:16px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;background:var(--tc)}
+.legend i.b{background:var(--bloom);border-radius:50%}
+.plist{display:flex;flex-direction:column;gap:8px}
+details.plant{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+details.plant summary{list-style:none;cursor:pointer;padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,260px);gap:8px 16px;align-items:center}
+details.plant summary::-webkit-details-marker{display:none}
+.pname{font-weight:600}
+.pname .n{font-variant-numeric:tabular-nums;color:var(--accent);margin-right:6px}
+.pbot{font-size:13px;color:var(--muted);font-style:italic}
+.cat{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.year{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.year div{display:flex;flex-direction:column;align-items:center;gap:2px}
+.year .m{font-size:10px;color:var(--muted);line-height:1}
+.year .cell{width:100%;height:22px;border-radius:4px;background:var(--bg);display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:2px;padding:2px}
+.year .cell.bl{background:var(--bloom-soft);box-shadow:inset 0 -3px 0 var(--bloom)}
+.year .cell.cur{outline:1.5px solid var(--accent)}
+.year .cell i{width:6px;height:6px;border-radius:2px;background:var(--tc)}
+.pbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
+.note{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:14px}
+.tl{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:86px 1fr;gap:10px;font-size:14px}
+.tl b{font-weight:600;color:var(--tc);font-size:13px}
+.tl .ty{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+footer{font-size:13px;color:var(--muted)}
+@media (max-width:560px){
+  details.plant summary{grid-template-columns:1fr}
+  .months{grid-template-columns:repeat(6,1fr)}
+  .tl li{grid-template-columns:72px 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Gartenkalender · <span id="plantTotal"></span> Pflanzen</div>
+      <h1 id="title">Oktober</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="views" role="group" aria-label="Ansicht">
+      <button id="vMonth" aria-pressed="true">Monat</button>
+      <button id="vPlants" aria-pressed="false">Pflanzen</button>
+    </div>
+  </header>
+
+  <nav class="months" id="months" aria-label="Monat wählen"></nav>
+
+  <section id="monthView" class="wrap" style="gap:22px">
+    <div class="bloomrow" id="bloom"></div>
+    <div class="progress"><span id="progTxt"></span><div class="track"><i id="progBar"></i></div></div>
+    <div id="groups" class="wrap" style="gap:22px"></div>
+  </section>
+
+  <section id="plantView" hidden class="wrap" style="gap:14px">
+    <div class="legend" id="legend"></div>
+    <div class="plist" id="plist"></div>
+  </section>
+
+  <footer>Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert.</footer>
+</div>
+
+<script>
+const MON=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+const MS=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
+const TYPES={s:{n:"Schneiden",c:"--c-s"},d:{n:"Düngen",c:"--c-d"},w:{n:"Winterschutz",c:"--c-w"},p:{n:"Pflanzen & Teilen",c:"--c-p"},g:{n:"Pflege & Giessen",c:"--c-g"},k:{n:"Kontrolle & Krankheiten",c:"--c-k"}};
+const ORDER=["w","s","d","p","g","k"];
+
+/* ---- Pflegepläne ---- */
+const HIBISKUS=[
+ [[3,4],"s","Vor dem Austrieb um etwa ein Drittel einkürzen, dünne und nach innen wachsende Triebe entfernen. Blüht am neuen Holz."],
+ [[4],"d","Kompost oder organischen Blütendünger geben."],
+ [[6],"d","Zweite Düngergabe, danach nicht mehr düngen."],
+ [[5],"k","Treibt sehr spät aus, oft erst Ende Mai. Nicht vorschnell aufgeben oder ausgraben."],
+ [[6,7],"k","Triebspitzen auf Blattläuse kontrollieren."],
+ [[7,8],"g","Bei Trockenheit giessen, sonst wirft er Knospen ab."],
+ [[11],"w","Wurzelbereich mit Laub oder Rindenmulch abdecken, besonders bei jungen Pflanzen."]];
+const HIB_NOTE="Angaben für Garten-Hibiskus (Hibiscus syriacus). Ist einer davon ein Zimmerhibiskus im Topf (Hibiscus rosa-sinensis), muss er ab Oktober hell und kühl ins Haus.";
+const ROSE=[
+ [[3,4],"s","Hauptschnitt, wenn die Forsythien blühen: Erfrorenes und Schwaches entfernen, kräftige Triebe auf 3–5 Augen kürzen."],
+ [[4],"w","Anhäufelung abtragen, bei Stammrosen die Hülle von der Krone nehmen."],
+ [[4],"d","Rosendünger oder Kompost leicht einarbeiten."],
+ [[6],"d","Zweite Gabe Rosendünger nach der ersten Blüte."],
+ [[8],"d","Kein Stickstoff mehr. Optional Kalidünger (Patentkali), damit das Holz ausreift."],
+ [[6,7,8,9],"s","Verblühtes laufend bis zum ersten vollständigen Blatt abschneiden."],
+ [[5,6,7,8],"k","Auf Sternrusstau (schwarze Flecken), Mehltau und Blattläuse achten. Befallene Blätter entfernen."],
+ [[10,11],"k","Abgefallenes, krankes Laub aufsammeln und in den Hausmüll, nicht auf den Kompost."],
+ [[11],"w","Veredelungsstelle 15–20 cm hoch mit Erde oder Kompost anhäufeln. Bei Stammrosen die Krone mit Vlies oder Jute einpacken."]];
+const ECHI=[
+ [[2,3],"s","Alte Stängel bodennah abschneiden, bevor der Neuaustrieb kommt."],
+ [[4],"d","Etwas Kompost um die Pflanzen verteilen."],
+ [[4,5],"k","Schnecken fressen den jungen Austrieb gern. Kontrollieren."],
+ [[7,8],"s","Verblühtes bis zum nächsten Blatt abschneiden, das verlängert die Blüte."],
+ [[8],"k","Bei Trockenheit kann Mehltau auftreten: an die Wurzel giessen, nicht über die Blätter."],
+ [[9,10,11],"g","Samenstände stehen lassen: Futter für Vögel und Winterquartier für Insekten. Nicht im Herbst zurückschneiden."]];
+const CHAM=[
+ [[3],"w","Winterschutz an milden Tagen entfernen, bei Nachtfrost wieder auflegen."],
+ [[4,5],"s","Braune und vertrocknete Wedel nah am Stamm abschneiden."],
+ [[4,5,6,7],"d","Alle 2–4 Wochen Palmendünger geben."],
+ [[8],"d","Letzte Düngung, dann Pause bis April."],
+ [[6,7,8],"k","Blattunterseiten auf Spinnmilben und Schildläuse kontrollieren."],
+ [[11],"w","Wurzelbereich mulchen. Bei Frost unter ca. −6 °C Wedel locker zusammenbinden und mit Vlies umhüllen. Im Topf: Kübel isolieren oder hell und frostfrei stellen."],
+ [[12,1,2],"w","Bei Dauerfrost Vlies drauflassen, an milden Tagen lüften. Das Herz vor Nässe schützen, sonst droht Herzfäule."]];
+const CHAM_NOTE="Zwergpalmen vertragen kurzzeitig etwa −10 °C. Nässe im Winter schadet ihnen mehr als Kälte.";
+const HERBSTASTER=[
+ [[3],"s","Alte Stängel bodennah abschneiden. Über den Winter stehen lassen ist gut für Insekten."],
+ [[3,4],"p","Alle 3–4 Jahre im Frühjahr teilen, damit sie blühfreudig bleiben."],
+ [[4],"d","Kompost geben."],
+ [[5],"g","Hohe Sorten stützen oder Ende Mai um ein Drittel kürzen, damit sie nicht umfallen."],
+ [[7,8],"k","Auf Mehltau achten, vor allem bei Glattblatt-Astern. Morgens an die Wurzel giessen."],
+ [[11],"g","Verblühte Stängel bis März stehen lassen."]];
+
+const PLANTS=[
+ {id:"hortensie",name:"Schneeball-Hortensie",sorte:"'Annabelle'",bot:"Hydrangea arborescens",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:[
+  [[3],"s","Kräftig zurückschneiden: alle Triebe auf 20–30 cm (1–2 Knospenpaare). Sie blüht am neuen Holz."],
+  [[4],"d","Hortensiendünger oder Kompost geben."],
+  [[5],"g","Stütze oder Staudenring setzen, damit die schweren Blüten bei Regen nicht umkippen."],
+  [[6],"d","Zweite Düngergabe, danach nicht mehr düngen."],
+  [[6,7,8],"g","Bei Hitze morgens durchdringend giessen. Hortensien brauchen viel Wasser."],
+  [[7,8],"k","Auf Mehltau (weisser Belag) und Blattläuse achten."],
+  [[10,11],"g","Verblühte Blütenbälle als Winterschmuck stehen lassen, erst im März schneiden."]]},
+ {id:"hib1",name:"Hibiskus",sorte:"gross, weiss",bot:"Hibiscus",n:1,cat:"Gehölze",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
+ {id:"hib2",name:"Hibiskus",sorte:"klein",bot:"Hibiscus",n:1,cat:"Gehölze",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
+ {id:"rose1",name:"Rose",sorte:"hoch",bot:"Rosa",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:ROSE},
+ {id:"rose2",name:"Rose",sorte:"niedrig",bot:"Rosa",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:ROSE},
+ {id:"johb",name:"Johannisbeere",sorte:"",bot:"Ribes",n:1,cat:"Gehölze",bloom:[4],tasks:[
+  [[2],"s","Falls im Sommer nicht geschnitten: jetzt älteste Triebe bodennah entfernen."],
+  [[3],"d","Kompost oder Beerendünger rund um den Strauch verteilen."],
+  [[5],"g","Mulchschicht aus Rasenschnitt oder Rindenmulch auftragen. Die Wurzeln sind flach."],
+  [[5,6],"k","Auf Blasenläuse (rote Beulen auf den Blättern) und Mehltau achten."],
+  [[6,7],"g","Ernten, sobald die Trauben vollständig gefärbt sind."],
+  [[7,8],"s","Nach der Ernte älteste Triebe (über 3–4 Jahre, dunkle Rinde) bodennah entfernen. 8–10 kräftige Triebe behalten."]]},
+ {id:"musa",name:"Bananenpalme",sorte:"",bot:"Musa basjoo",n:3,cat:"Palmen & Exoten",bloom:[],note:"Die Blätter erfrieren beim ersten Frost, das ist normal. Wichtig ist, dass Wurzelstock und Stamm trocken und frostgeschützt bleiben.",tasks:[
+  [[4],"w","An milden Tagen die Abdeckung lüften und den Winterschutz schrittweise abbauen."],
+  [[5],"w","Nach den Eisheiligen (Mitte Mai) Winterschutz ganz entfernen und erfrorene Teile abschneiden."],
+  [[5,6,7],"d","Starkzehrer: alle 1–2 Wochen flüssig düngen oder organisch."],
+  [[8],"d","Ab Mitte August nicht mehr düngen, damit die Pflanze ausreift."],
+  [[6],"p","Ausläufer (Kindel) bei Bedarf mit dem Spaten abstechen und verpflanzen."],
+  [[6,7,8],"g","Bei Hitze sehr viel giessen, gern täglich."],
+  [[10],"w","Material für den Winterschutz bereitlegen: Laub, Stroh, Vlies, Jute oder Drahtgitter."],
+  [[11],"w","Nach dem ersten Frost Blätter abschneiden, Stämme einpacken (Drahtgitter mit Laub oder Stroh füllen, Vlies drum), Wurzelbereich 30–50 cm dick mulchen und oben vor Regen abdecken."],
+  [[12,1,2],"k","Winterschutz nach Sturm und Schnee kontrollieren. Er muss trocken bleiben."]]},
+ {id:"cham1",name:"Zwergpalme",sorte:"'Vulcano'",bot:"Chamaerops humilis",n:1,cat:"Palmen & Exoten",bloom:[],note:"'Vulcano' wächst kompakter und gilt als etwas frosthärter. "+CHAM_NOTE,tasks:CHAM},
+ {id:"cham2",name:"Zwergpalme",sorte:"",bot:"Chamaerops humilis",n:1,cat:"Palmen & Exoten",bloom:[],note:CHAM_NOTE,tasks:CHAM},
+ {id:"trachy",name:"Hanfpalme",sorte:"'Frosty'",bot:"Trachycarpus fortunei",n:2,cat:"Palmen & Exoten",bloom:[],note:"Hanfpalmen sind die frosthärtesten Gartenpalmen. Ältere, eingewachsene Exemplare brauchen meist keinen Winterschutz mehr.",tasks:[
+  [[3],"w","Vlies entfernen."],
+  [[4,5],"s","Braune, hängende Wedel am Stamm abschneiden, einen kurzen Stummel lassen."],
+  [[4,5,6,7],"d","Alle 3–4 Wochen Palmendünger geben."],
+  [[7,8],"g","Bei Trockenheit durchdringend giessen."],
+  [[11],"w","Wurzelbereich mulchen. Junge Pflanzen: bei starkem Frost (unter ca. −12 °C) Wedel zusammenbinden und Vlies drüber."],
+  [[12,1,2],"g","Schwere Schneelast von den Wedeln abschütteln."]]},
+ {id:"echi1",name:"Sonnenhut",sorte:"weiss",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],tasks:ECHI},
+ {id:"echi2",name:"Sonnenhut",sorte:"orange",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],note:"Farbige Sorten sind oft kurzlebiger. Staunässe im Winter unbedingt vermeiden.",tasks:ECHI},
+ {id:"echi3",name:"Sonnenhut",sorte:"rosa",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],tasks:ECHI},
+ {id:"geranium",name:"Storchschnabel",sorte:"'Rozanne'",bot:"Geranium",n:6,cat:"Stauden",bloom:[6,7,8,9,10],tasks:[
+  [[3],"s","Alte Triebe bodennah abschneiden, falls nicht schon im Herbst gemacht."],
+  [[4],"d","Kompost geben."],
+  [[7],"s","Fällt die Pflanze in der Mitte auseinander, um ein Drittel einkürzen. Sie treibt schnell nach und blüht weiter."],
+  [[11],"s","Nach der Blüte bodennah zurückschneiden oder bis März stehen lassen."]]},
+ {id:"alpenaster",name:"Alpen-Aster",sorte:"'Happy End'",bot:"Aster alpinus",n:7,cat:"Stauden",bloom:[5,6],tasks:[
+  [[3],"s","Abgestorbenes Laub entfernen."],
+  [[4],"d","Nur wenig Kompost, sie mag es mager."],
+  [[4,5],"k","Auf Schnecken und Mehltau achten."],
+  [[7],"s","Verblühtes abschneiden."],
+  [[8,9],"p","Alle 3–4 Jahre nach der Blüte teilen, sonst wird sie in der Mitte kahl."],
+  [[11],"w","Staunässe vermeiden, kein Laub auf den Rosetten liegen lassen."]]},
+ {id:"glocke",name:"Knäuel-Glockenblume",sorte:"",bot:"Campanula glomerata",n:2,cat:"Stauden",bloom:[6,7],tasks:[
+  [[3],"s","Alte Triebe bodennah entfernen."],
+  [[3,4],"p","Breitet sich aus: bei Bedarf alle paar Jahre teilen."],
+  [[4],"d","Etwas Kompost geben."],
+  [[4,5],"k","Schnecken kontrollieren."],
+  [[7],"s","Nach der ersten Blüte zurückschneiden, oft folgt eine zweite."]]},
+ {id:"helenium",name:"Sonnenbraut",sorte:"'Helene' rot",bot:"Helenium",n:2,cat:"Stauden",bloom:[7,8,9],tasks:[
+  [[3],"s","Alte Stängel bodennah abschneiden."],
+  [[3,4],"p","Alle 3 Jahre im Frühjahr teilen."],
+  [[4],"d","Kompost oder organischen Dünger geben."],
+  [[4,5],"k","Schnecken am jungen Austrieb kontrollieren."],
+  [[5],"s","Optional Ende Mai um ein Drittel kürzen: standfester, blüht etwas später und länger."],
+  [[6],"d","Zweite Gabe. Sonnenbraut braucht viele Nährstoffe."],
+  [[7,8],"g","Gleichmässig feucht halten, Trockenheit verträgt sie schlecht."],
+  [[8,9],"s","Verblühtes ausschneiden."]]},
+ {id:"phlox",name:"Flammenblume",sorte:"rosa",bot:"Phlox paniculata",n:2,cat:"Stauden",bloom:[7,8,9],tasks:[
+  [[4],"d","Kompost und organischen Dünger geben."],
+  [[5],"g","Schwache Triebe ausdünnen, 5–7 kräftige stehen lassen. Mehr Luft heisst weniger Mehltau."],
+  [[6],"d","Zweite Düngergabe."],
+  [[7,8],"k","Echter Mehltau (weisser Belag): befallene Blätter entfernen, morgens an die Wurzel giessen."],
+  [[7,8],"g","Bei Trockenheit giessen."],
+  [[8,9],"s","Verblühte Dolden abschneiden, dann blühen die Seitentriebe nach."],
+  [[11],"s","Bodennah zurückschneiden. Laub mit Mehltau nicht auf den Kompost."]]},
+ {id:"liatris",name:"Prachtscharte",sorte:"violett",bot:"Liatris spicata",n:2,cat:"Stauden",bloom:[7,8],tasks:[
+  [[3],"s","Alte Stängel und Laub entfernen."],
+  [[4],"d","Wenig Kompost geben."],
+  [[4,5],"k","Schnecken und Wühlmäuse mögen die Knollen."],
+  [[8,9],"s","Verblühte Ähren abschneiden."],
+  [[11],"w","Die Knollen vertragen keine Staunässe. Boden durchlässig halten, nicht dick abdecken."]]},
+ {id:"stachys",name:"Woll-Ziest",sorte:"violett-rosa",bot:"Stachys byzantina",n:3,cat:"Stauden",bloom:[6,7],tasks:[
+  [[3],"g","Fauliges und unansehnliches Laub auszupfen."],
+  [[3,4],"p","Alle 3–4 Jahre teilen, wenn die Mitte kahl wird."],
+  [[4],"d","Kaum Dünger nötig, er mag magere Böden."],
+  [[7],"s","Blütenstände nach der Blüte abschneiden, dann bleibt der silbrige Blattteppich schön."],
+  [[11],"k","Nasse Blätter faulen leicht: Herbstlaub nicht darauf liegen lassen."]]},
+ {id:"aster",name:"Aster",sorte:"Sorte unbekannt",bot:"Aster",n:2,cat:"Stauden",bloom:[8,9,10],note:"Pflege wie Herbstastern angenommen. Wenn du die Sorte kennst, kann ich die Angaben anpassen.",tasks:HERBSTASTER},
+ {id:"herbstaster",name:"Herbstastern",sorte:"diverse",bot:"Aster / Symphyotrichum",n:null,cat:"Stauden",bloom:[8,9,10],tasks:HERBSTASTER},
+ {id:"gaura",name:"Prachtkerze",sorte:"rosa",bot:"Gaura lindheimeri",n:1,cat:"Stauden",bloom:[6,7,8,9,10],note:"Nur bedingt winterhart und eher kurzlebig. Im Herbst nicht zurückschneiden.",tasks:[
+  [[3],"w","Reisig und Laub entfernen."],
+  [[4],"s","Erst jetzt zurückschneiden, auf 10–15 cm."],
+  [[5],"d","Etwas Kompost, sonst sparsam düngen."],
+  [[7],"s","Verblühte Triebe um ein Drittel kürzen, dann blüht sie bis Oktober."],
+  [[11],"w","Wurzelbereich mit Laub und Reisig abdecken."]]},
+ {id:"heliopsis",name:"Sonnenauge",sorte:"",bot:"Heliopsis",n:1,cat:"Stauden",bloom:[7,8,9],tasks:[
+  [[3],"s","Alte Stängel bodennah abschneiden."],
+  [[4],"d","Kompost geben."],
+  [[5],"g","Bei Bedarf eine Stütze setzen."],
+  [[6,7],"k","Rote Blattläuse an den Stängeln und Mehltau kontrollieren."],
+  [[8,9],"s","Verblühtes ausschneiden."]]},
+ {id:"catharanthus",name:"Madagaskar-Immergrün",sorte:"'Soirée'",bot:"Catharanthus roseus",n:3,cat:"Sommerblumen",bloom:[6,7,8,9],note:"Nicht winterhart (unter ca. 10 °C leidet es). Alle Pflanzenteile sind giftig, beim Schneiden Handschuhe tragen.",tasks:[
+  [[5],"p","Nach den Eisheiligen (Mitte Mai) an einen warmen, sonnigen Platz pflanzen."],
+  [[6,7,8],"d","Alle 2 Wochen Flüssigdünger."],
+  [[6,7,8],"g","Mässig giessen, keine Staunässe."],
+  [[10],"p","Vor dem ersten Frost entsorgen oder hell bei 15–20 °C im Haus überwintern."]]},
+ {id:"celosia",name:"Federbusch",sorte:"'Venezuela'",bot:"Celosia argentea",n:1,cat:"Sommerblumen",bloom:[7,8,9],note:"Einjährig, nicht winterhart.",tasks:[
+  [[5],"p","Ende Mai nach den Eisheiligen an einen sonnigen, warmen Platz pflanzen."],
+  [[6,7,8],"d","Alle 2 Wochen Flüssigdünger."],
+  [[7,8],"g","Gleichmässig feucht halten."],
+  [[9,10],"p","Optional Samen ernten. Vor dem ersten Frost auf den Kompost."]]},
+ {id:"allg",name:"Ganzer Garten",sorte:"",bot:"",n:null,cat:"Allgemein",bloom:[],tasks:[
+  [[2],"g","Gartenschere reinigen und schärfen. Saubere Schnitte heilen besser."],
+  [[3],"d","Reifen Kompost in allen Beeten verteilen."],
+  [[5],"k","Eisheilige (11.–15. Mai) abwarten, bevor Frostempfindliches ausgepflanzt oder ganz abgedeckt wird."],
+  [[10,11],"w","Laub sammeln. Es ist der beste Winterschutz für Bananen, Palmen und Rosen."]]}
+];
+
+/* ---- Zustand ---- */
+const now=new Date(); const CUR=now.getMonth()+1; const YEAR=now.getFullYear();
+let month=CUR, view="month";
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}};
+try{const v=store.get("gk-view"); if(v==="plants") view="plants";}catch(e){}
+const $=id=>document.getElementById(id);
+const tc=t=>`var(${TYPES[t].c})`;
+const label=p=>p.name+(p.sorte?` ${p.sorte}`:"");
+const cnt=p=>p.n?`${p.n}×`:"";
+
+function tasksFor(m){
+  const out=[];
+  PLANTS.forEach(p=>p.tasks.forEach((t,i)=>{ if(t[0].includes(m)) out.push({p,type:t[1],text:t[2],key:`gk-${YEAR}-${m}-${p.id}-${i}`}); }));
+  return out;
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function renderMonths(){
+  $("months").innerHTML=MS.map((m,i)=>{
+    const mm=i+1, ts=tasksFor(mm), done=ts.filter(t=>store.get(t.key)).length;
+    const pct=ts.length?Math.round(done/ts.length*100):0;
+    return `<button data-m="${mm}" aria-pressed="${mm===month}" aria-label="${MON[i]}, ${ts.length} Aufgaben">${m}<span class="bar"><i style="width:${pct}%"></i></span>${mm===CUR?'<span class="now">jetzt</span>':''}</button>`;
+  }).join("");
+}
+function renderMonth(){
+  const ts=tasksFor(month);
+  $("title").textContent=MON[month-1];
+  const blooming=PLANTS.filter(p=>p.bloom.includes(month));
+  $("bloom").innerHTML=blooming.length?`<span class="lbl">Blüht jetzt</span>`+blooming.map(p=>`<span class="chip">${esc(label(p))}</span>`).join(""):`<span class="lbl">Blüht jetzt</span><span style="color:var(--muted)">nichts – Ruhezeit</span>`;
+  const done=ts.filter(t=>store.get(t.key)).length;
+  $("sub").textContent=`${ts.length} Aufgaben in diesem Monat`;
+  $("progTxt").textContent=`${done} von ${ts.length} erledigt`;
+  $("progBar").style.width=(ts.length?done/ts.length*100:0)+"%";
+  if(!ts.length){$("groups").innerHTML=`<div class="empty">In diesem Monat gibt es nichts zu tun.</div>`;return}
+  $("groups").innerHTML=ORDER.filter(t=>ts.some(x=>x.type===t)).map(t=>{
+    const list=ts.filter(x=>x.type===t);
+    return `<div class="group" style="--tc:${tc(t)}"><h2><span class="dot"></span>${TYPES[t].n} <small>${list.length}</small></h2>`+
+      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}><span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span><br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
+  }).join("");
+}
+function renderPlants(){
+  $("title").textContent="Meine Pflanzen";
+  $("sub").textContent="Jahresübersicht pro Pflanze – antippen für Details";
+  $("legend").innerHTML=`<span><i class="b"></i>Blütezeit</span>`+ORDER.map(t=>`<span style="--tc:${tc(t)}"><i></i>${TYPES[t].n}</span>`).join("");
+  let lastCat="";
+  $("plist").innerHTML=PLANTS.map(p=>{
+    let head="";
+    if(p.cat!==lastCat){lastCat=p.cat; head=`<div class="cat" style="margin-top:8px">${p.cat}</div>`;}
+    const year=MS.map((m,i)=>{const mm=i+1;const types=ORDER.filter(t=>p.tasks.some(x=>x[1]===t&&x[0].includes(mm)));
+      return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===month?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
+    const rows=[];
+    for(let mm=1;mm<=12;mm++) p.tasks.forEach(x=>{if(x[0][0]===mm) rows.push(x)});
+    const tl=rows.map(x=>`<li style="--tc:${tc(x[1])}"><span><b>${x[0].map(m=>MS[m-1]).join("–").replace(/^(\w+)–.*–(\w+)$/,"$1–$2")}</b><span class="ty">${TYPES[x[1]].n.split(" ")[0]}</span></span><span>${esc(x[2])}</span></li>`).join("");
+    return head+`<details class="plant" id="d-${p.id}"><summary><div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.bot?`<div class="pbot">${esc(p.bot)}</div>`:""}</div><div class="year">${year}</div></summary><div class="pbody">${p.note?`<div class="note">${esc(p.note)}</div>`:""}<ul class="tl">${tl}</ul></div></details>`;
+  }).join("");
+}
+function render(){
+  $("vMonth").setAttribute("aria-pressed",view==="month");
+  $("vPlants").setAttribute("aria-pressed",view==="plants");
+  $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants";
+  renderMonths();
+  view==="month"?renderMonth():renderPlants();
+}
+$("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;month=+b.dataset.m;render()});
+$("groups").addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;store.set(k,e.target.checked?"1":"");renderMonths();renderMonth()});
+$("vMonth").onclick=()=>{view="month";store.set("gk-view","month");render()};
+$("vPlants").onclick=()=>{view="plants";store.set("gk-view","plants");render()};
+$("plantTotal").textContent=PLANTS.reduce((a,p)=>a+(p.n||0),0)+"+";
+render();
+if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+</script>
+</body>
+</html>
