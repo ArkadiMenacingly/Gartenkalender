@@ -22,6 +22,7 @@
   --bg:#EEF1EA; --surface:#FFFFFF; --ink:#1E2A21; --muted:#5D6A5F; --line:#D5DCD0;
   --accent:#4E46A8; --accent-soft:#E6E4F6; --bloom:#D9579A; --bloom-soft:#F7DDEA;
   --c-s:#B4532F; --c-d:#3D7A33; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A;
+  --pic-bg:#DDE5D6; --leaf:#5E9A4E;
   --display:"Young Serif", Georgia, "Times New Roman", serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -29,11 +30,13 @@
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
   --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
   --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
   --accent:#A9A2F2; --accent-soft:#2A2850; --bloom:#F08CBF; --bloom-soft:#43243A;
   --c-s:#E58A66; --c-d:#86C779; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;
@@ -96,15 +99,36 @@ details.plant summary::-webkit-details-marker{display:none}
 .year .cell i{width:6px;height:6px;border-radius:2px;background:var(--tc)}
 .pbody{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--line);padding-top:12px}
 .note{background:var(--accent-soft);border-radius:8px;padding:10px 12px;font-size:14px}
-.tl{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
-.tl li{display:grid;grid-template-columns:86px 1fr;gap:10px;font-size:14px}
-.tl b{font-weight:600;color:var(--tc);font-size:13px}
-.tl .ty{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tl{display:flex;flex-direction:column;gap:0;margin:0;padding:0;list-style:none}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:12px;font-size:14px;padding:10px 0;border-top:1px solid var(--line)}
+.tl li.curm b{color:var(--accent)}
+.tl b{font-weight:600;font-size:14px}
+.tlx{display:flex;flex-direction:column;gap:8px;align-items:flex-start;min-width:0}
+.tlx>div{border-left:3px solid var(--tc);padding-left:9px}
+.tlx .ty{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--tc);font-weight:700}
+.pbody h3{font-family:var(--display);font-weight:400;font-size:20px;margin:6px 0 0}
+.ptop{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.pmeta{display:flex;flex-direction:column;gap:10px;flex:1;min-width:200px}
+.filters{display:flex;flex-wrap:wrap;gap:6px}
+.filters .btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.filters .fc{font-weight:500;opacity:.7;font-variant-numeric:tabular-nums}
 footer{font-size:13px;color:var(--muted)}
+.pic{width:44px;height:44px;border-radius:50%;overflow:hidden;flex:none;display:block;background:var(--pic-bg)}
+.pic svg,.pic img{width:100%;height:100%;display:block;object-fit:cover}
+.task{grid-template-columns:auto auto 1fr}
+.task .pic{width:40px;height:40px}
+.ph{display:flex;align-items:center;gap:12px;min-width:0}
+.ph .pic{width:52px;height:52px}
+.photo-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.ghost{background:none;color:var(--muted)}
+.bigpic{width:120px;height:120px;border-radius:14px;overflow:hidden;background:var(--pic-bg)}
+.bigpic svg,.bigpic img{width:100%;height:100%;display:block;object-fit:cover}
 @media (max-width:560px){
   details.plant summary{grid-template-columns:1fr}
   .months{grid-template-columns:repeat(6,1fr)}
-  .tl li{grid-template-columns:72px 1fr}
+  .tl li{grid-template-columns:1fr;gap:6px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -133,6 +157,7 @@ footer{font-size:13px;color:var(--muted)}
   </section>
 
   <section id="plantView" hidden class="wrap" style="gap:14px">
+    <div class="filters" id="filters" role="group" aria-label="Pflanzenart"></div>
     <div class="legend" id="legend"></div>
     <div class="plist" id="plist"></div>
   </section>
@@ -191,7 +216,7 @@ const HERBSTASTER=[
  [[11],"g","Verblühte Stängel bis März stehen lassen."]];
 
 const PLANTS=[
- {id:"hortensie",name:"Schneeball-Hortensie",sorte:"'Annabelle'",bot:"Hydrangea arborescens",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:[
+ {id:"hortensie",name:"Schneeball-Hortensie",sorte:"'Annabelle'",bot:"Hydrangea arborescens",n:1,cat:"Sträucher",bloom:[6,7,8,9],tasks:[
   [[3],"s","Kräftig zurückschneiden: alle Triebe auf 20–30 cm (1–2 Knospenpaare). Sie blüht am neuen Holz."],
   [[4],"d","Hortensiendünger oder Kompost geben."],
   [[5],"g","Stütze oder Staudenring setzen, damit die schweren Blüten bei Regen nicht umkippen."],
@@ -199,11 +224,11 @@ const PLANTS=[
   [[6,7,8],"g","Bei Hitze morgens durchdringend giessen. Hortensien brauchen viel Wasser."],
   [[7,8],"k","Auf Mehltau (weisser Belag) und Blattläuse achten."],
   [[10,11],"g","Verblühte Blütenbälle als Winterschmuck stehen lassen, erst im März schneiden."]]},
- {id:"hib1",name:"Hibiskus",sorte:"gross, weiss",bot:"Hibiscus",n:1,cat:"Gehölze",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
- {id:"hib2",name:"Hibiskus",sorte:"klein",bot:"Hibiscus",n:1,cat:"Gehölze",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
- {id:"rose1",name:"Rose",sorte:"hoch",bot:"Rosa",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:ROSE},
- {id:"rose2",name:"Rose",sorte:"niedrig",bot:"Rosa",n:1,cat:"Gehölze",bloom:[6,7,8,9],tasks:ROSE},
- {id:"johb",name:"Johannisbeere",sorte:"",bot:"Ribes",n:1,cat:"Gehölze",bloom:[4],tasks:[
+ {id:"hib1",name:"Hibiskus",sorte:"gross, weiss",bot:"Hibiscus",n:1,cat:"Sträucher",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
+ {id:"hib2",name:"Hibiskus",sorte:"klein",bot:"Hibiscus",n:1,cat:"Sträucher",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
+ {id:"rose1",name:"Rose",sorte:"hoch",bot:"Rosa",n:1,cat:"Rosen",bloom:[6,7,8,9],tasks:ROSE},
+ {id:"rose2",name:"Rose",sorte:"niedrig",bot:"Rosa",n:1,cat:"Rosen",bloom:[6,7,8,9],tasks:ROSE},
+ {id:"johb",name:"Johannisbeere",sorte:"",bot:"Ribes",n:1,cat:"Beeren",bloom:[4],tasks:[
   [[2],"s","Falls im Sommer nicht geschnitten: jetzt älteste Triebe bodennah entfernen."],
   [[3],"d","Kompost oder Beerendünger rund um den Strauch verteilen."],
   [[5],"g","Mulchschicht aus Rasenschnitt oder Rindenmulch auftragen. Die Wurzeln sind flach."],
@@ -310,22 +335,51 @@ const PLANTS=[
   [[10,11],"w","Laub sammeln. Es ist der beste Winterschutz für Bananen, Palmen und Rosen."]]}
 ];
 
+/* ---- Illustrationen ---- */
+const G="var(--leaf)", SH="rgba(0,0,0,.14)";
+const W=s=>`<svg viewBox="0 0 64 64" aria-hidden="true">${s}</svg>`;
+const stem=(x=32,y1=40)=>`<path d="M${x} ${y1} L${x} 64" stroke="${G}" stroke-width="2.4" stroke-linecap="round"/><ellipse cx="${x+7}" cy="${y1+13}" rx="7" ry="3" fill="${G}" transform="rotate(-30 ${x+7} ${y1+13})"/>`;
+function daisy(p,c,n,len,cr){const cy=28;let s=stem(32,cy+4);for(let i=0;i<n;i++)s+=`<ellipse cx="32" cy="${(cy-len*.62).toFixed(1)}" rx="3.1" ry="${(len*.5).toFixed(1)}" fill="${p}" stroke="${SH}" stroke-width=".5" transform="rotate(${(i*360/n).toFixed(1)} 32 ${cy})"/>`;return W(s+`<circle cx="32" cy="${cy}" r="${cr}" fill="${c}"/>`)}
+function ball(){let s=stem(32,40);[[0,1],[4.6,6],[9.2,12],[13.8,19]].forEach(([r,k])=>{for(let i=0;i<k;i++){const a=i/k*Math.PI*2+r,x=32+r*Math.cos(a),y=28+r*Math.sin(a);s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.4" fill="#F3F6E4" stroke="#AFC283" stroke-width=".7"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r=".9" fill="#AFC283"/>`}});return W(s)}
+function hib(p,c){let s=`<ellipse cx="50" cy="52" rx="9" ry="4" fill="${G}" transform="rotate(-25 50 52)"/>`;for(let i=0;i<5;i++)s+=`<ellipse cx="32" cy="21" rx="9.5" ry="12" fill="${p}" stroke="${SH}" stroke-width=".6" transform="rotate(${i*72} 32 32)"/>`;return W(s+`<circle cx="32" cy="32" r="5" fill="${c}"/><path d="M32 32 L41 21" stroke="#E9C33D" stroke-width="1.6"/><circle cx="41" cy="21" r="2" fill="#E9C33D"/>`)}
+function rose(p,d){return W(`<ellipse cx="18" cy="50" rx="9" ry="4" fill="${G}" transform="rotate(25 18 50)"/><ellipse cx="46" cy="50" rx="9" ry="4" fill="${G}" transform="rotate(-25 46 50)"/><circle cx="32" cy="30" r="17" fill="${p}"/><g fill="none" stroke="${d}" stroke-width="1.6" stroke-linecap="round"><path d="M18 35 Q32 50 46 35"/><path d="M21 30 Q32 14 43 30"/><path d="M25 34 Q32 24 39 34"/><path d="M29 29 Q32 25 35 29 Q34 33 30 32"/></g>`)}
+function currant(){let s=`<path d="M10 12 Q30 16 50 10" stroke="#7A5A3A" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M38 12 q10 -8 18 2 q-8 8 -18 -2z" fill="${G}"/><path d="M26 14 Q29 32 30 52" stroke="#6E8C3A" stroke-width="1.4" fill="none"/>`;[[27,21],[32,25],[26,30],[32,34],[27,39],[32,44],[29,50]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="3.8" fill="#D7263D"/><circle cx="${x-1.2}" cy="${y-1.3}" r="1" fill="#FFFFFF" opacity=".7"/>`);return W(s)}
+function banana(){let s=`<rect x="29" y="36" width="6" height="28" rx="2" fill="#7E9C4C"/>`;[-62,-22,22,60].forEach(a=>s+=`<g transform="rotate(${a} 32 38)"><ellipse cx="32" cy="18" rx="7.5" ry="18" fill="#6FAF4F"/><path d="M32 36 L32 2" stroke="${SH}" stroke-width="1.2"/></g>`);return W(s)}
+function fan(col,trunk){const oy=trunk?34:44;let s=trunk?`<rect x="28.5" y="34" width="7" height="30" fill="#8A6A45"/><path d="M28.5 42h7M28.5 50h7M28.5 58h7" stroke="#6B4F31" stroke-width="1.2"/>`:"";for(let i=0;i<=10;i++){const a=(-80+i*16)*Math.PI/180,L=trunk?24:28;s+=`<path d="M32 ${oy} L${(32+L*Math.sin(a)).toFixed(1)} ${(oy-L*Math.cos(a)).toFixed(1)}" stroke="${col}" stroke-width="3.4" stroke-linecap="round"/>`}if(!trunk)for(let i=0;i<=6;i++){const a=(-60+i*20)*Math.PI/180;s+=`<path d="M32 50 L${(32+18*Math.sin(a)).toFixed(1)} ${(50-18*Math.cos(a)).toFixed(1)}" stroke="${col}" stroke-width="2.6" stroke-linecap="round" opacity=".75"/>`}return W(s)}
+function gera(p,c){let s=stem(32,36);for(let i=0;i<5;i++){const a=i*72*Math.PI/180;s+=`<circle cx="${(32+8.5*Math.sin(a)).toFixed(1)}" cy="${(28-8.5*Math.cos(a)).toFixed(1)}" r="8.6" fill="${p}" stroke="${SH}" stroke-width=".6"/>`}return W(s+`<circle cx="32" cy="28" r="5" fill="${c}"/>`)}
+function bells(p){let s=stem(32,36);[[32,14],[23,20],[41,20],[27,28],[37,28],[19,31],[45,31]].forEach(([x,y])=>s+=`<path d="M${x-4} ${y-5} Q${x} ${y-10} ${x+4} ${y-5} L${x+5.5} ${y+4} Q${x} ${y+1.5} ${x-5.5} ${y+4}Z" fill="${p}" stroke="${SH}" stroke-width=".6"/>`);return W(s)}
+function phlox(p,c){let s=stem(32,38);[[3,14],[5,20],[6,26],[6,32]].forEach(([n,y],j)=>{for(let i=0;i<n;i++){const x=32+(i-(n-1)/2)*6.4;s+=`<circle cx="${x.toFixed(1)}" cy="${y}" r="3.5" fill="${p}" stroke="${SH}" stroke-width=".5"/><circle cx="${x.toFixed(1)}" cy="${y}" r="1" fill="${c}"/>`}});return W(s)}
+function spike(p){let s=`<path d="M32 64 L32 8" stroke="${G}" stroke-width="2"/><path d="M26 64 Q24 50 18 44M38 64 Q40 50 46 44M30 64 Q26 54 22 50" stroke="${G}" stroke-width="1.8" fill="none"/>`;for(let k=0;k<13;k++){const y=8+k*2.6,w=3.5+k*.35;s+=`<ellipse cx="32" cy="${y.toFixed(1)}" rx="${w.toFixed(1)}" ry="2.2" fill="${p}" opacity="${k%2?1:.8}"/>`}return W(s)}
+function plume(p){return W(stem(32,44)+`<path d="M32 6 C21 22 19 34 23 46 L41 46 C45 34 43 22 32 6Z" fill="${p}"/><path d="M32 12 L31 44M27 24 L26 44M37 24 L37 44" stroke="#FFFFFF" stroke-opacity=".3" stroke-width="1.2"/>`)}
+function stachys(p){let s=`<path d="M32 56 L32 12" stroke="#9AA596" stroke-width="2"/>`;[[-1,50],[1,50],[-1,58],[1,58]].forEach(([d,y])=>s+=`<ellipse cx="${32+d*10}" cy="${y}" rx="10" ry="4.5" fill="#B9C2B4" stroke="#8F9A8A" stroke-width=".6" transform="rotate(${d*-15} ${32+d*10} ${y})"/>`);[14,21,28,35].forEach(y=>{for(const dx of[-4,0,4])s+=`<circle cx="${32+dx}" cy="${y}" r="2.4" fill="${p}"/>`});return W(s)}
+function gaura(p){let s=`<g stroke="${G}" stroke-width="1.6" fill="none"><path d="M32 64 Q28 40 18 14"/><path d="M32 64 Q34 36 42 10"/><path d="M32 64 Q38 44 52 28"/><path d="M32 64 Q26 50 12 40"/></g>`;const f=(x,y)=>{let r="";for(let i=0;i<4;i++)r+=`<ellipse cx="${x}" cy="${y-3}" rx="2" ry="3.4" fill="${p}" transform="rotate(${i*90+20} ${x} ${y})"/>`;return r};[[18,14],[42,10],[52,28],[12,40],[25,30],[38,26]].forEach(([x,y])=>s+=f(x,y));return W(s)}
+function pin(p){let s=`<ellipse cx="20" cy="52" rx="10" ry="4.5" fill="${G}" transform="rotate(20 20 52)"/><ellipse cx="44" cy="52" rx="10" ry="4.5" fill="${G}" transform="rotate(-20 44 52)"/>`;for(let i=0;i<5;i++)s+=`<path d="M32 30 C26 22 26 12 34 10 C40 12 38 22 32 30Z" fill="${p}" stroke="${SH}" stroke-width=".6" transform="rotate(${i*72} 32 30)"/>`;return W(s+`<circle cx="32" cy="30" r="3.6" fill="#FFFFFF"/><circle cx="32" cy="30" r="1.5" fill="#9E1F55"/>`)}
+function sprout(){return W(`<ellipse cx="32" cy="54" rx="20" ry="6" fill="#8A6A45"/><path d="M32 52 L32 26" stroke="${G}" stroke-width="3" stroke-linecap="round"/><ellipse cx="23" cy="26" rx="10" ry="5" fill="${G}" transform="rotate(-35 23 26)"/><ellipse cx="41" cy="20" rx="11" ry="5.5" fill="${G}" transform="rotate(30 41 20)"/>`)}
+const PIC={hortensie:ball(),hib1:hib("#FFFFFF","#B0284A"),hib2:hib("#B9A6E0","#7A2A6A"),rose1:rose("#D9416A","#8E1F3F"),rose2:rose("#E8718F","#A3304F"),johb:currant(),musa:banana(),cham1:fan("#7FA59A",false),cham2:fan("#5E9A4E",false),trachy:fan("#3F8A48",true),
+ echi1:daisy("#F6F3EA","#C88A2A",14,15,7),echi2:daisy("#F08A3C","#6B3E1A",14,15,7),echi3:daisy("#E07AA8","#A8522A",14,15,7),geranium:gera("#6C63D6","#F1EEFF"),alpenaster:daisy("#E58BB8","#F2C230",22,11,5),glocke:bells("#6D4BC2"),
+ helenium:daisy("#C2402C","#4F2E15",12,13,7),phlox:phlox("#E98BB9","#B03A7A"),liatris:spike("#9B4FC7"),stachys:stachys("#C77FB0"),aster:daisy("#8E7BE0","#F2C230",24,12,4.5),herbstaster:daisy("#A08CE8","#F2C230",24,12,4.5),
+ gaura:gaura("#F2A9C9"),heliopsis:daisy("#F2B81C","#B9710F",14,14,6),catharanthus:pin("#E0559A"),celosia:plume("#D4283A"),allg:sprout()};
+
 /* ---- Zustand ---- */
+const CATS=["Sträucher","Rosen","Beeren","Palmen & Exoten","Stauden","Sommerblumen","Allgemein"];
 const now=new Date(); const CUR=now.getMonth()+1; const YEAR=now.getFullYear();
-let month=CUR, view="month";
-const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k)}catch(e){}}};
-try{const v=store.get("gk-view"); if(v==="plants") view="plants";}catch(e){}
+let month=CUR, view="month", cat="Alle", openId=null;
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true}catch(e){return false}}};
+if(store.get("gk-view")==="plants") view="plants";
+const sc=store.get("gk-cat"); if(sc&&(sc==="Alle"||CATS.includes(sc))) cat=sc;
 const $=id=>document.getElementById(id);
 const tc=t=>`var(${TYPES[t].c})`;
 const label=p=>p.name+(p.sorte?` ${p.sorte}`:"");
 const cnt=p=>p.n?`${p.n}×`:"";
+const photo=id=>store.get("gk-photo-"+id);
+const picHTML=(p,cls="pic")=>{const ph=photo(p.id);return `<span class="${cls}">${ph?`<img src="${ph}" alt="Foto ${esc(label(p))}">`:(PIC[p.id]||"")}</span>`};
 
 function tasksFor(m){
   const out=[];
   PLANTS.forEach(p=>p.tasks.forEach((t,i)=>{ if(t[0].includes(m)) out.push({p,type:t[1],text:t[2],key:`gk-${YEAR}-${m}-${p.id}-${i}`}); }));
   return out;
 }
-function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
 function renderMonths(){
   $("months").innerHTML=MS.map((m,i)=>{
@@ -338,7 +392,7 @@ function renderMonth(){
   const ts=tasksFor(month);
   $("title").textContent=MON[month-1];
   const blooming=PLANTS.filter(p=>p.bloom.includes(month));
-  $("bloom").innerHTML=blooming.length?`<span class="lbl">Blüht jetzt</span>`+blooming.map(p=>`<span class="chip">${esc(label(p))}</span>`).join(""):`<span class="lbl">Blüht jetzt</span><span style="color:var(--muted)">nichts – Ruhezeit</span>`;
+  $("bloom").innerHTML=`<span class="lbl">Blüht jetzt</span>`+(blooming.length?blooming.map(p=>`<span class="chip">${esc(label(p))}</span>`).join(""):`<span style="color:var(--muted)">nichts – Ruhezeit</span>`);
   const done=ts.filter(t=>store.get(t.key)).length;
   $("sub").textContent=`${ts.length} Aufgaben in diesem Monat`;
   $("progTxt").textContent=`${done} von ${ts.length} erledigt`;
@@ -347,34 +401,60 @@ function renderMonth(){
   $("groups").innerHTML=ORDER.filter(t=>ts.some(x=>x.type===t)).map(t=>{
     const list=ts.filter(x=>x.type===t);
     return `<div class="group" style="--tc:${tc(t)}"><h2><span class="dot"></span>${TYPES[t].n} <small>${list.length}</small></h2>`+
-      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}><span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span><br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
+      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}>${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span><br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
   }).join("");
+}
+function yearRows(p){
+  const rows=[];
+  for(let mm=1;mm<=12;mm++){
+    const ts=p.tasks.filter(x=>x[0].includes(mm)), bl=p.bloom.includes(mm);
+    if(!ts.length&&!bl) continue;
+    rows.push(`<li${mm===CUR?' class="curm"':''}><b>${MON[mm-1]}</b><div class="tlx">${bl?'<span class="chip">blüht</span>':''}${ts.map(x=>`<div style="--tc:${tc(x[1])}"><span class="ty">${TYPES[x[1]].n}</span>${esc(x[2])}</div>`).join("")}</div></li>`);
+  }
+  return rows.join("");
 }
 function renderPlants(){
   $("title").textContent="Meine Pflanzen";
-  $("sub").textContent="Jahresübersicht pro Pflanze – antippen für Details";
+  $("sub").textContent="Pflanzenart wählen, dann Pflanze antippen für die Jahresübersicht";
+  const counts={}; PLANTS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
+  $("filters").innerHTML=["Alle",...CATS].map(c=>`<button class="btn" data-cat="${c}" aria-pressed="${c===cat}">${c} <span class="fc">${c==="Alle"?PLANTS.length:counts[c]||0}</span></button>`).join("");
   $("legend").innerHTML=`<span><i class="b"></i>Blütezeit</span>`+ORDER.map(t=>`<span style="--tc:${tc(t)}"><i></i>${TYPES[t].n}</span>`).join("");
+  const list=PLANTS.filter(p=>cat==="Alle"||p.cat===cat).sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat));
   let lastCat="";
-  $("plist").innerHTML=PLANTS.map(p=>{
+  $("plist").innerHTML=list.map(p=>{
     let head="";
-    if(p.cat!==lastCat){lastCat=p.cat; head=`<div class="cat" style="margin-top:8px">${p.cat}</div>`;}
+    if(cat==="Alle"&&p.cat!==lastCat){lastCat=p.cat; head=`<div class="cat" style="margin-top:8px">${p.cat}</div>`;}
     const year=MS.map((m,i)=>{const mm=i+1;const types=ORDER.filter(t=>p.tasks.some(x=>x[1]===t&&x[0].includes(mm)));
-      return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===month?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
-    const rows=[];
-    for(let mm=1;mm<=12;mm++) p.tasks.forEach(x=>{if(x[0][0]===mm) rows.push(x)});
-    const tl=rows.map(x=>`<li style="--tc:${tc(x[1])}"><span><b>${x[0].map(m=>MS[m-1]).join("–").replace(/^(\w+)–.*–(\w+)$/,"$1–$2")}</b><span class="ty">${TYPES[x[1]].n.split(" ")[0]}</span></span><span>${esc(x[2])}</span></li>`).join("");
-    return head+`<details class="plant" id="d-${p.id}"><summary><div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.bot?`<div class="pbot">${esc(p.bot)}</div>`:""}</div><div class="year">${year}</div></summary><div class="pbody">${p.note?`<div class="note">${esc(p.note)}</div>`:""}<ul class="tl">${tl}</ul></div></details>`;
+      return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===CUR?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
+    const has=!!photo(p.id);
+    return head+`<details class="plant" data-id="${p.id}"${p.id===openId?' open':''}><summary><div class="ph">${picHTML(p)}<div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.bot?`<div class="pbot">${esc(p.bot)}</div>`:""}</div></div><div class="year">${year}</div></summary>
+      <div class="pbody"><div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="ph-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="ph-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
+      <h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul></div></details>`;
   }).join("");
 }
 function render(){
   $("vMonth").setAttribute("aria-pressed",view==="month");
   $("vPlants").setAttribute("aria-pressed",view==="plants");
   $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants";
+  $("months").hidden=view!=="month";
   renderMonths();
   view==="month"?renderMonth():renderPlants();
 }
+function addPhoto(id,file){
+  const url=URL.createObjectURL(file), img=new Image();
+  img.onload=()=>{const s=320,c=document.createElement("canvas");c.width=c.height=s;const m=Math.min(img.naturalWidth,img.naturalHeight);
+    c.getContext("2d").drawImage(img,(img.naturalWidth-m)/2,(img.naturalHeight-m)/2,m,m,0,0,s,s);URL.revokeObjectURL(url);
+    const ok=store.set("gk-photo-"+id,c.toDataURL("image/jpeg",.8));openId=id;render();
+    if(!ok){const d=document.querySelector(`details[data-id="${id}"] .photo-actions`);if(d)d.insertAdjacentHTML("beforeend",'<span style="color:var(--c-k)">Foto konnte nicht gespeichert werden (Speicher voll oder privates Fenster).</span>')}};
+  img.onerror=()=>URL.revokeObjectURL(url);
+  img.src=url;
+}
 $("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;month=+b.dataset.m;render()});
 $("groups").addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;store.set(k,e.target.checked?"1":"");renderMonths();renderMonth()});
+$("filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.cat;store.set("gk-cat",cat);openId=null;renderPlants()});
+$("plist").addEventListener("toggle",e=>{const d=e.target;if(d.tagName!=="DETAILS")return;if(d.open)openId=d.dataset.id;else if(openId===d.dataset.id)openId=null},true);
+$("plist").addEventListener("change",e=>{const id=e.target.dataset.photo;if(id&&e.target.files[0])addPhoto(id,e.target.files[0])});
+$("plist").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;e.preventDefault();store.set("gk-photo-"+b.dataset.rm,"");openId=b.dataset.rm;render()});
 $("vMonth").onclick=()=>{view="month";store.set("gk-view","month");render()};
 $("vPlants").onclick=()=>{view="plants";store.set("gk-view","plants");render()};
 $("plantTotal").textContent=PLANTS.reduce((a,p)=>a+(p.n||0),0)+"+";
