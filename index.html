@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-title" content="Garten">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
-<title>Mein Gartenkalender</title>
+<title>Mein Garten</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Figtree:wght@400;500;600;700&display=swap">
 <style>
@@ -21,7 +21,7 @@
 :root{
   --bg:#F0F6EF; --surface:#FFFFFF; --ink:#16261B; --muted:#5D6A5F; --line:#D5DCD0;
   --accent:#178A3E; --accent-soft:#DFF2E3; --bloom:#D9579A; --bloom-soft:#F7DDEA;
-  --c-s:#B4532F; --c-d:#7350C0; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A;
+  --c-s:#B4532F; --c-d:#7350C0; --c-w:#2F6596; --c-p:#9A7420; --c-g:#25807B; --c-k:#A8356A; --c-a:#5E8A1E; --c-e:#C2571A;
   --pic-bg:#DDE5D6; --leaf:#5E9A4E;
   --display:"Young Serif", Georgia, "Times New Roman", serif;
   --body:"Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -29,13 +29,13 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
   --accent:#5FD38A; --accent-soft:#183A23; --bloom:#F08CBF; --bloom-soft:#43243A;
-  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1; --c-a:#A8D46A; --c-e:#F0995E;
   --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#141A16; --surface:#1C241E; --ink:#E7EDE6; --muted:#9AA79C; --line:#2E3A31;
   --accent:#5FD38A; --accent-soft:#183A23; --bloom:#F08CBF; --bloom-soft:#43243A;
-  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1;
+  --c-s:#E58A66; --c-d:#B7A2F0; --c-w:#7DB2E3; --c-p:#D9B45C; --c-g:#6CC9C2; --c-k:#E683B1; --c-a:#A8D46A; --c-e:#F0995E;
   --pic-bg:#2A352D; --leaf:#6FB25C;
   color-scheme:dark}
 *{box-sizing:border-box}
@@ -157,6 +157,55 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
 .btn.ghost{background:none;color:var(--muted)}
 .bigpic{width:120px;height:120px;border-radius:14px;overflow:hidden;background:var(--pic-bg)}
 .bigpic svg,.bigpic img{width:100%;height:100%;display:block;object-fit:cover}
+.pic,.bigpic{position:relative}
+.pic img,.bigpic img{position:absolute;inset:0}
+.back{font:inherit;font-size:14px;font-weight:600;border:0;background:none;color:var(--accent);padding:4px 0;cursor:pointer}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tile{font:inherit;color:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:0;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+.tile:hover{border-color:var(--accent);transform:translateY(-2px)}
+.mosaic{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:110px;gap:2px;background:var(--line)}
+.mosaic span{position:relative;background:var(--pic-bg);overflow:hidden}
+.mosaic svg,.mosaic img{width:100%;height:100%;object-fit:cover;display:block}
+.mosaic img{position:absolute;inset:0}
+.mosaic svg{padding:14px}
+.tile-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:4px}
+.tile h2{font-family:var(--display);font-weight:400;font-size:30px;line-height:1.1;margin:0}
+.tile .meta{color:var(--muted);font-size:14px}
+.tile .go{color:var(--accent);font-weight:600;margin-top:6px}
+.gwrap{display:flex;flex-direction:column;gap:10px}
+.gh{font-family:var(--display);font-weight:400;font-size:22px;margin:10px 0 0}
+.verdict{background:var(--accent-soft);border-radius:14px;padding:14px 16px}
+.verdict h3{font-family:var(--display);font-weight:400;font-size:20px;margin:0 0 6px}
+.verdict ul{margin:0;padding-left:18px}.verdict li{margin:4px 0}
+details.gcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.gcard summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:84px 1fr;gap:12px;padding:12px;align-items:center}
+.gcard summary::-webkit-details-marker{display:none}
+.gthumb{width:84px;height:84px;border-radius:10px;overflow:hidden;position:relative;background:var(--pic-bg)}
+.gthumb svg,.gthumb img,.gimg svg,.gimg img{width:100%;height:100%;object-fit:cover;display:block}
+.gthumb img,.gimg img{position:absolute;inset:0}
+.gtitle{font-weight:600;font-size:16px}
+.gsci{font-size:13px;color:var(--muted);font-style:italic}
+.gshort{font-size:14px;margin-top:2px}
+.gcard .more{font-size:13px;color:var(--accent);font-weight:600}
+.gcard[open] .more{display:none}
+.gbody{border-top:1px solid var(--line);padding:12px 14px 14px;display:flex;flex-direction:column;gap:12px}
+.gphotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.gphotos figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.gimg{aspect-ratio:4/3;border-radius:10px;overflow:hidden;position:relative;background:var(--pic-bg)}
+figcaption,.credit{font-size:12px;color:var(--muted)}
+.credit a{color:inherit}
+.gsec h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.gsec ul{margin:0;padding-left:18px}.gsec li{margin:3px 0}
+.gsec.act h4{color:var(--c-k)}
+.tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:12px;padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+.tag.good{background:var(--accent-soft);border-color:transparent;color:var(--ink)}
+.vlist{list-style:none;margin:0;padding:0}
+.vlist li{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:9px 0;border-top:1px solid var(--line);align-items:start}
+.vdot{width:14px;height:14px;border-radius:50%;margin-top:4px;background:var(--vc);box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.vn{font-weight:600}.vt{font-size:13px;color:var(--muted)}
+.tips{margin:0;padding-left:18px;font-size:14px}.tips li{margin:3px 0}
+
 @media (max-width:560px){
   details.plant summary{grid-template-columns:1fr}
   .months{grid-template-columns:repeat(6,1fr)}
@@ -167,10 +216,23 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
 
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="home" hidden>
   <header>
     <div>
-      <div class="eyebrow">Gartenkalender · <span id="plantTotal"></span> Pflanzen</div>
+      <div class="eyebrow" id="homeDate"></div>
+      <h1>Mein Garten</h1>
+      <div class="sub">Welches Beet möchtest du ansehen?</div>
+    </div>
+  </header>
+  <div class="tiles" id="tiles"></div>
+  <footer>Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später.</footer>
+</div>
+
+<div class="wrap" id="bedApp" hidden>
+  <header>
+    <div>
+      <button type="button" class="back" id="backHome">‹ Übersicht</button>
+      <div class="eyebrow"><span id="bedName"></span> · <span id="plantTotal"></span></div>
       <h1 id="title">Oktober</h1>
       <div class="sub" id="sub"></div>
     </div>
@@ -178,6 +240,7 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
       <button id="vMonth" aria-pressed="true">Monat</button>
       <button id="vPlants" aria-pressed="false">Pflanzen</button>
       <button id="vDis" aria-pressed="false">Krankheiten</button>
+      <button id="vGuide" aria-pressed="false" hidden>Ratgeber</button>
     </div>
   </header>
 
@@ -200,15 +263,17 @@ button.chip{font:inherit;font-size:13px;border:0;cursor:pointer}
     <div class="dlist" id="dlist"></div>
   </section>
 
+  <section id="guideView" hidden class="gwrap"></section>
+
   <div class="sheet" id="sheet" hidden><div class="sheet-card" role="dialog" aria-modal="true" aria-label="Jahresübersicht"><div class="sheet-head"><span class="eyebrow">Pflanze</span><button type="button" class="btn" id="sheetClose">Schliessen</button></div><div id="sheetBody" class="pbody" style="border:0;padding:0"></div></div></div>
 
-  <footer>Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert.</footer>
+  <footer id="bedFoot">Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert.</footer>
 </div>
 
 <script>
 const MON=["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
 const MS=["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"];
-const TYPES={s:{n:"Schneiden",c:"--c-s"},d:{n:"Düngen",c:"--c-d"},w:{n:"Winterschutz",c:"--c-w"},p:{n:"Pflanzen & Teilen",c:"--c-p"},g:{n:"Pflege & Giessen",c:"--c-g"},k:{n:"Kontrolle & Krankheiten",c:"--c-k"}};
+const TYPES={a:{n:"Aussaat & Anzucht",c:"--c-a"},e:{n:"Ernte",c:"--c-e"},s:{n:"Schneiden",c:"--c-s"},d:{n:"Düngen",c:"--c-d"},w:{n:"Winterschutz",c:"--c-w"},p:{n:"Pflanzen & Teilen",c:"--c-p"},g:{n:"Pflege & Giessen",c:"--c-g"},k:{n:"Kontrolle & Krankheiten",c:"--c-k"}};
 const ORDER=["w","s","d","p","g","k"];
 
 /* ---- Pflegepläne ---- */
@@ -497,28 +562,239 @@ const PIC={hortensie:ball(),hib:hib("#FFFFFF","#B0284A"),rose:rose("#D9416A","#8
  helenium:daisy("#C2402C","#4F2E15",12,13,7),phlox:phlox("#E98BB9","#B03A7A"),liatris:spike("#9B4FC7"),stachys:stachys("#C77FB0"),herbstaster:daisy("#A08CE8","#F2C230",24,12,4.5),
  gaura:gaura("#F2A9C9"),heliopsis:daisy("#F2B81C","#B9710F",14,14,6),catharanthus:pin("#E0559A"),celosia:plume("#D4283A"),allg:sprout()};
 
+/* ---- Hochbeet: Fotos (Wikimedia Commons) ---- */
+const CM=f=>"https://commons.wikimedia.org/wiki/Special:FilePath/"+encodeURIComponent(f.replace(/ /g,"_"))+"?width=480";
+const CMP=f=>"https://commons.wikimedia.org/wiki/File:"+encodeURIComponent(f.replace(/ /g,"_"));
+const IMG={
+ tomato:"Tomato je.jpg", cherry:"Cherry Tomato Harvest.jpg",
+ cucumber:"Climbing cucumber plant.jpg", cucumber2:"Cucumber plants.jpg",
+ zucchini:"Zucchini Plant.jpg", zucchini2:"Cucurbita pepo Zucchini flower and plant.jpg",
+ padron:"Pimientos de Padrón Madrid 2010 0709.jpg", bell:"Red capsicum and cross section.jpg",
+ blight:"Tomato late blight foliar lesions (5816740026).jpg", blightLeaf:"TomateBlattPhytophthorainfestans.jpg", blightFruit:"Braunfaeule frucht.jpg",
+ alt:"Alternaria solani - leaf lesions.jpg", mite:"Tetranychus urticae with silk threads.jpg",
+ downy:"Cucurbit downy mildew (Pseudoperonospora cubensis) 5581639.jpg", downy2:"Falscher Mehltau.jpg",
+ powdery:"Powdery mildew on zucchini leaf.jpg"
+};
+const imgTag=(f,alt)=>f?`<img src="${CM(f)}" alt="${esc(alt)}" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">`:"";
+
+/* ---- Hochbeet: Illustrationen (Ersatz, falls ein Foto nicht lädt) ---- */
+function tomatoSvg(c){return W(`<path d="M32 4 L32 16" stroke="${G}" stroke-width="2.4" stroke-linecap="round"/><circle cx="32" cy="38" r="20" fill="${c}"/><ellipse cx="25" cy="31" rx="5" ry="3" fill="#FFFFFF" opacity=".3" transform="rotate(-30 25 31)"/><path d="M32 18 L24 14 L28 21 L20 22 L28 25 L32 32 L36 25 L44 22 L36 21 L40 14Z" fill="${G}"/>`)}
+function cucSvg(){let s=`<g transform="rotate(-35 32 32)"><rect x="8" y="24" width="48" height="16" rx="8" fill="#3F7A35"/><path d="M14 28 Q32 25 50 28" stroke="#6FAF4F" stroke-width="2" fill="none"/>`;[[16,30],[24,35],[32,30],[40,35],[48,31]].forEach(([x,y])=>s+=`<circle cx="${x}" cy="${y}" r="1" fill="#DDEBC8"/>`);return W(s+`<rect x="54" y="30" width="6" height="4" rx="1.5" fill="#6E8C3A"/></g>`)}
+function zucSvg(){return W(`<g transform="rotate(-35 32 32)"><rect x="6" y="23" width="46" height="18" rx="9" fill="#F0B81E"/><path d="M12 28 Q30 25 48 28" stroke="#FFF2B0" stroke-width="2" fill="none" opacity=".8"/><path d="M50 27 L60 29 L60 35 L50 37Z" fill="#5E8A2E"/></g>`)}
+function pepSvg(c,long){return W(long?`<path d="M30 6 Q30 12 34 14" stroke="${G}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 16 Q36 10 42 18 Q44 34 36 50 Q30 60 24 58 Q20 40 26 16Z" fill="${c}"/><path d="M30 22 Q28 38 27 52" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="2" fill="none"/>`
+ :`<path d="M32 4 Q31 10 33 14" stroke="${G}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M22 18 Q32 12 42 18 Q52 22 50 38 Q48 54 40 56 Q34 58 32 54 Q30 58 24 56 Q16 54 14 38 Q12 22 22 18Z" fill="${c}"/><path d="M24 24 Q20 36 23 48" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="2.4" fill="none"/>`)}
+function leafSvg(spots){return W(`<path d="M32 60 L32 34" stroke="${G}" stroke-width="2.4"/><path d="M32 6 C48 10 58 24 54 36 C50 46 40 48 32 40 C24 48 14 46 10 36 C6 24 16 10 32 6Z" fill="#6FA84F"/><path d="M32 8 L32 40 M32 22 L18 16 M32 22 L46 16 M32 32 L16 30 M32 32 L48 30" stroke="#4E7F36" stroke-width="1" fill="none"/>${spots}`)}
+const SPOTS={
+ blight:`<path d="M42 12 C52 16 56 26 50 32 C44 30 40 22 42 12Z" fill="#6B4A2A" opacity=".85"/><path d="M14 22 C20 24 22 32 16 36 C11 32 10 26 14 22Z" fill="#7A5A35" opacity=".8"/>`,
+ alt:[[22,18],[42,22],[30,30],[18,34]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="5" fill="#E8D26A" opacity=".7"/><circle cx="${x}" cy="${y}" r="3.6" fill="#4A3220"/><circle cx="${x}" cy="${y}" r="2.2" fill="none" stroke="#7A5A35" stroke-width=".8"/>`).join(""),
+ mite:Array.from({length:40},(_,i)=>`<circle cx="${(14+((i*37)%36)).toFixed(0)}" cy="${(12+((i*23)%28)).toFixed(0)}" r=".9" fill="#E7F0C8"/>`).join("")+`<path d="M12 14 L26 22 M40 12 L52 22 M20 30 L46 26" stroke="#FFFFFF" stroke-opacity=".7" stroke-width=".5"/>`,
+ powdery:`<g fill="#FFFFFF" opacity=".85"><circle cx="22" cy="18" r="6"/><circle cx="40" cy="20" r="7"/><circle cx="30" cy="30" r="5"/><circle cx="16" cy="32" r="4"/><circle cx="46" cy="32" r="4"/></g>`,
+ downy:`<g fill="#E3CF5A"><path d="M20 14 h8 v8 h-8z"/><path d="M36 16 h9 v7 h-9z"/><path d="M24 28 h7 v7 h-7z"/><path d="M40 28 h7 v6 h-7z"/></g><path d="M20 14 h8 v8 h-8z" fill="#8A6A3A" opacity=".6"/>`
+};
+Object.assign(PIC,{"v-tom":tomatoSvg("#D23A2A"),"v-gur":cucSvg(),"v-zuc":zucSvg(),"v-pap":pepSvg("#C8261E"),"v-hb":sprout()});
+
+/* ---- Hochbeet: Pflanzen und Pflegepläne ---- */
+const VCATS=["Tomaten","Gurken","Zucchini","Paprika","Allgemein"];
+const VEG=[
+ {id:"v-tom",name:"Tomaten",sorte:"7 Sorten, alle mit PhR",bot:"Solanum lycopersicum",n:7,cat:"Tomaten",bloom:[],img:IMG.tomato,
+  note:"„PhR“ bedeutet eine hohe Toleranz gegen Kraut- und Braunfäule, keine Immunität. Gegen Dürrfleckenkrankheit und Spinnmilben schützt PhR nicht – im trockenen Sommer 2026 waren das vermutlich die Hauptursachen für die braunen Blätter.",
+  vars:[
+   {n:"Rondobella PhR",t:"Salattomate · rot, rund · Freiland",c:"#C8322B",tags:["Bio","PhR"]},
+   {n:"Buffalosun F1 PhR",t:"Fleischtomate · gelb-rot geflammt",c:"#E99A2B",tags:["F1","PhR"]},
+   {n:"Vivagrande PhR",t:"Fleischtomate · rot, aromatisch · Freiland",c:"#B52A22",tags:["Bio","PhR","samenfest"]},
+   {n:"Black Moon F1 PhR",t:"Stab-/Cocktailtomate · dunkelviolett, reif rot",c:"#4A2230",tags:["F1","PhR"]},
+   {n:"Gourmansun F1 PhR",t:"Ochsenherz · gelb-rot geflammt",c:"#E5A23A",tags:["F1","PhR"]},
+   {n:"Resi PhR",t:"Kirschtomate · rot · Freiland",c:"#B8302A",tags:["Bio","PhR"]},
+   {n:"Appleberry Yellow F1 PhR",t:"Cherrytomate · gelb, erdbeerförmig",c:"#F2C230",tags:["F1","PhR"]}],
+  tips:["Fleisch- und Ochsenherztomaten (Buffalosun, Vivagrande, Gourmansun, Rondobella) eintriebig ziehen.","Kirsch- und Cherrytomaten (Resi, Appleberry, Black Moon) dürfen zwei Triebe behalten.","F1-Sorten fallen aus eigenen Samen nicht sortenecht aus – dafür jedes Jahr neues Saatgut."],
+  tasks:[
+   [[3],"a","Mitte bis Ende März aussäen, bei 22–25 °C. Nach dem Keimen hell und etwas kühler stellen (ca. 18 °C), sonst werden die Pflanzen lang und dünn."],
+   [[4],"a","Pikieren, sobald das erste echte Blattpaar da ist. Tief in Einzeltöpfe setzen, bis knapp unter die Keimblätter."],
+   [[4,5],"g","Ab Ende April an warmen Tagen stundenweise draussen abhärten."],
+   [[5],"p","Nach den Eisheiligen pflanzen: 60–70 cm Abstand, etwas tiefer setzen, Spiralstab dazu, gleich mulchen. Basilikum und Tagetes dazwischen."],
+   [[6,7,8,9],"s","Wöchentlich ausgeizen: die Triebe in den Blattachseln ausbrechen."],
+   [[6,7,8,9],"s","Untere Blätter laufend bis auf 30–40 cm Höhe entfernen. So spritzt keine Erde aufs Laub und Luft kommt durch."],
+   [[6,7,8],"d","Alle 2 Wochen organischen Tomatendünger geben, ab dem Fruchtansatz kalibetont."],
+   [[6,7,8,9],"g","Morgens am Boden giessen, gleichmässig, und Mulch nachlegen. Gestresste Pflanzen bekommen viel eher Dürrflecken."],
+   [[6,7,8],"k","Alle 1–2 Wochen vorbeugend Schachtelhalmbrühe spritzen. Sie stärkt die Blätter gegen Pilze."],
+   [[6,7,8,9],"k","Wöchentlicher Kontrollgang: Zielscheiben-Flecken (Dürrflecken), grosse braune Flecken (Krautfäule), helle Sprenkel und Gespinste (Spinnmilben). Befallene Blätter sofort entfernen."],
+   [[7,8],"g","An Hitzetagen die Blattunterseiten morgens kurz abbrausen – gegen Spinnmilben. Bis zum Abend ist das Laub wieder trocken."],
+   [[7,8,9,10],"e","Laufend ernten, sobald die Früchte ausgefärbt sind."],
+   [[9],"s","Ende September die Triebspitzen kappen und neue Blüten entfernen. So reifen die vorhandenen Früchte noch aus."],
+   [[10],"e","Vor dem ersten Frost alle Früchte ernten. Grüne Tomaten reifen drinnen nach."],
+   [[10,11],"k","Pflanzen ganz entfernen und in den Kehricht, nicht auf den Kompost. Spiralstäbe und Schnüre mit Brennsprit reinigen."]]},
+ {id:"v-gur",name:"Gurken",sorte:"4 Sorten",bot:"Cucumis sativus",n:4,cat:"Gurken",bloom:[],img:IMG.cucumber,
+  note:"Gurken lieben Wärme und gleichmässige Feuchtigkeit. Krautfäule befällt Gurken nicht – braune Blätter kommen meist vom Falschen Mehltau.",
+  vars:[
+   {n:"Superstar F1",t:"Salatgurke · lang, glatt",c:"#2F5E2A",tags:["F1"]},
+   {n:"Murza F1",t:"Landgurke · rein weiblich blühend",c:"#3F7A35",tags:["F1"]},
+   {n:"Salamanda F1",t:"Mini-Snackgurke",c:"#5E9A3E",tags:["F1"]},
+   {n:"Marketmore",t:"Freilandgurke · robust",c:"#3A6E2E",tags:["Bio","samenfest"]}],
+  tips:["Murza blüht rein weiblich und setzt auch ohne Bestäuber Früchte an.","Marketmore ist samenfest – du kannst Samen selbst gewinnen."],
+  tasks:[
+   [[4],"a","Ende April einzeln in Töpfe säen (je 2 Samen), bei 22–25 °C. Sie keimen in wenigen Tagen."],
+   [[5],"p","Ende Mai pflanzen, wenn der Boden über 15 °C hat. An ein Rankgitter oder eine Schnur – senkrecht gezogen trocknen die Blätter schneller."],
+   [[6],"a","Mitte Juni 1–2 Pflanzen nachsäen. Sie übernehmen, wenn die ersten im August vom Mehltau braun werden."],
+   [[6,7],"s","Bei Salatgurken die Seitentriebe nach der ersten Frucht kappen. Die untersten 50 cm frei halten."],
+   [[6,7,8],"g","Gleichmässig am Boden giessen, möglichst mit abgestandenem Wasser. Mulchen."],
+   [[6,7,8],"d","Alle 2 Wochen organischen Flüssigdünger geben."],
+   [[6,7,8],"k","Wöchentlich morgens Milch mit Wasser (1:9) auf die Blätter spritzen."],
+   [[7,8],"k","Blätter kontrollieren: gelbe, eckige Flecken oben und grau-violetter Belag unten bedeuten Falschen Mehltau. Befallene Blätter sofort entfernen."],
+   [[7,8,9],"e","Regelmässig jung ernten, das fördert neue Früchte."],
+   [[10],"k","Pflanzen entfernen. Laub mit Mehltau in den Kehricht."]]},
+ {id:"v-zuc",name:"Zucchini",sorte:"'Soleil' gelb",bot:"Cucurbita pepo",n:1,cat:"Zucchini",bloom:[],img:IMG.zucchini,
+  note:"'Soleil' hat eine Mehltau-Resistenz. Das ist eine Toleranz: Der Befall kommt später und schwächer, aber ab August ist etwas Mehltau normal. Die Zucchini nicht ins Paprika-Beet setzen: Sie beschattet die Paprika und nimmt ihnen Wasser weg.",
+  vars:[{n:"Soleil",t:"goldgelbe Früchte · fein-mild",c:"#F0B81E",tags:["Mehltau-Resistenz"]}],
+  tasks:[
+   [[4],"a","Ende April einzeln in Töpfe vorziehen, bei 20–25 °C."],
+   [[5],"p","Ende Mai pflanzen. Eine Pflanze braucht rund 1 m². Sonnig und luftig, nicht ins Paprika-Beet."],
+   [[6],"a","Mitte Juni eine Pflanze nachsäen – als gesunder Ersatz für den Spätsommer."],
+   [[6,7,8],"g","Viel und gleichmässig am Boden giessen, dick mulchen. Trockenstress fördert Echten Mehltau."],
+   [[6,7,8],"d","Starkzehrer: Kompost beim Pflanzen, dann alle 2–3 Wochen organischen Flüssigdünger."],
+   [[6,7,8],"k","Wöchentlich Milch mit Wasser (1:9) spritzen. Ältere Blätter mit weissem Belag abschneiden, damit Luft an die Pflanze kommt."],
+   [[7,8,9],"e","Jung ernten, bei 15–20 cm Länge. Grosse Früchte schwächen die Pflanze."],
+   [[10],"k","Pflanze entfernen, befallenes Laub in den Kehricht."]]},
+ {id:"v-pap",name:"Paprika",sorte:"9 Sorten, alle Bio und samenfest",bot:"Capsicum annuum",n:9,cat:"Paprika",bloom:[],img:IMG.bell,
+  note:"Im heissen, trockenen Sommer 2026 haben die Paprika vermutlich wegen der Hitze kaum angesetzt: Über ca. 30 °C werfen sie Blüten ab. Erst im kühleren September ging es richtig los. Blockpaprika brauchen am längsten – Padrón, Spitz- und Hornpaprika tragen früher.",
+  vars:[
+   {n:"Padrón 'Herbón'",t:"Bratpaprika · grün ernten",c:"#4E8A2E",tags:["früh"]},
+   {n:"Marconi Rosso",t:"Riesen-Spitzpaprika · rot",c:"#C8261E",tags:["mittelfrüh"]},
+   {n:"Corno di Toro Rosso",t:"Hornpaprika · rot",c:"#9E1E22",tags:["mittelfrüh"]},
+   {n:"Corno di Toro Giallo",t:"Hornpaprika · gelb",c:"#E8B323",tags:["mittelfrüh"]},
+   {n:"Sweet Chocolate",t:"Blockpaprika · schokobraun",c:"#5A2A22",tags:["mittel"]},
+   {n:"Topepo Rosso",t:"Tomatenpaprika · flach-rund, rot",c:"#B5221D",tags:["mittel"]},
+   {n:"California Wonder",t:"Blockpaprika · rot",c:"#C42A20",tags:["spät"]},
+   {n:"Quadrato d'Asti Rosso",t:"Blockpaprika · gross, rot",c:"#B11F1B",tags:["spät"]},
+   {n:"Quadrato d'Asti Giallo",t:"Blockpaprika · gross, gelb",c:"#F0BE1E",tags:["spät"]}],
+  tips:["Die Angaben früh/mittel/spät sind Richtwerte für die Reifezeit.","Späte Blocksorten an den wärmsten Platz, am besten in grossen Töpfen (10–15 l) an eine Südwand.","Alle Sorten sind samenfest: Samen aus voll reifen Früchten kannst du selbst gewinnen.","Paprika lassen sich überwintern: im Oktober auf 15–20 cm zurückschneiden, eintopfen, hell und kühl (10–15 °C) stellen, wenig giessen. Im nächsten Jahr tragen sie deutlich früher."],
+  tasks:[
+   [[2],"a","Mitte Februar aussäen: Heizmatte (25–28 °C) und Pflanzenlampe mit 14–16 Stunden Licht. Die Keimung dauert 1–3 Wochen."],
+   [[3],"a","In Einzeltöpfe pikieren. Weiter unter der Lampe bei 20–22 °C, eher trocken halten."],
+   [[4],"a","In grössere Töpfe (ca. 1 Liter) umtopfen. Ab Ende April an warmen Tagen abhärten."],
+   [[5],"p","Ende Mai pflanzen, erst wenn der Boden über 15 °C hat. Sonnigster Platz, 40–50 cm Abstand. In kühlen Nächten Vlies drüber."],
+   [[6],"s","Die erste Blüte in der Verzweigung (Königsblüte) ausbrechen. Die Pflanze verzweigt sich dann besser und trägt mehr."],
+   [[6,7,8],"d","Ab der Blüte alle 2 Wochen kalibetont düngen (z. B. Tomatendünger), wenig Stickstoff."],
+   [[6,7,8],"g","Dick mulchen und gleichmässig am Boden giessen. Trockenstress führt zu Blütenabwurf."],
+   [[7,8],"g","An Hitzetagen über 30 °C über Mittag mit Schattiernetz oder Vlies leicht beschatten."],
+   [[6,7,8],"k","Blattläuse an den Triebspitzen und Spinnmilben an den Blattunterseiten kontrollieren."],
+   [[8,9,10],"e","Padrón klein und grün ernten (4–6 cm). Die anderen, sobald sie ausgefärbt sind – grün sind sie auch essbar."],
+   [[9],"s","Ab Mitte September neue Blüten entfernen, damit die vorhandenen Früchte noch reifen."],
+   [[10],"p","Vor dem ersten Frost alles ernten. Optional 1–2 kräftige Pflanzen zum Überwintern eintopfen (siehe Tipps)."]]},
+ {id:"v-hb",name:"Hochbeet allgemein",sorte:"Erde, Planung, Material",bot:"",n:null,cat:"Allgemein",bloom:[],
+  note:"Deine Hochbeete sind über 10 Jahre alt. Die Erde ist dann meist ausgelaugt, verdichtet und abgesackt, und Krankheitserreger haben sich angesammelt. Eine gründliche Erneuerung ist die wirksamste Vorbeugung.",
+  tasks:[
+   [[10],"p","Beete räumen: alle Reste von Tomaten, Gurken und Zucchini samt herabgefallenen Blättern in den Kehricht."],
+   [[10,11],"d","Erde erneuern: die oberen 30–40 cm abtragen und durch frische Hochbeeterde mit reifem Kompost ersetzen. Nach über 10 Jahren lohnt sich auch eine komplette Neubefüllung."],
+   [[11,12,1,2],"w","Beete über den Winter mit Laub von gesunden Bäumen oder mit Vlies abdecken."],
+   [[1],"g","Beetplan machen: Tomaten nicht an die gleiche Stelle, Paprika an den sonnigsten Platz, Zucchini ins eigene Beet."],
+   [[1,2],"p","Material besorgen: Pflanzenlampe, Heizmatte, Anzuchterde, Tropfschlauch oder Ollas, Schattiernetz."],
+   [[2,3],"k","Töpfe und Anzuchtschalen mit heissem Wasser und Bürste reinigen."],
+   [[4],"d","Kompost oberflächlich einarbeiten. Hornspäne nur sparsam – zu viel Stickstoff gibt Laub statt Früchte."],
+   [[5],"g","Tropfschlauch oder Ollas einrichten. Das hält den Boden gleichmässig feucht und die Blätter trocken."],
+   [[5],"k","Eisheilige (11.–15. Mai) abwarten, bevor Tomaten, Gurken, Zucchini und Paprika ins Beet kommen."]]}
+];
+
+/* ---- Hochbeet: Ratgeber ---- */
+const VERDICT=[
+ "<b>Tomaten:</b> Du hast immer am Boden gegossen und der Sommer war sehr trocken. Echte Krautfäule war deshalb eher unwahrscheinlich (höchstens nach Regen oder starkem Tau). Wahrscheinlicher sind Dürrfleckenkrankheit und Spinnmilben – gegen beide hilft PhR nicht.",
+ "<b>Zucchini:</b> Echter Mehltau, typisch für trockene, warme Sommer.",
+ "<b>Gurken:</b> Falscher Mehltau, kommt mit Tau in kühlen Nächten.",
+ "<b>Paprika:</b> Über ca. 30 °C werfen sie die Blüten ab. Erst im kühleren September konnten sie richtig ansetzen.",
+ "<b>Hochbeete:</b> Nach über 10 Jahren ist die Erde ausgelaugt. Eine Erneuerung macht alle Pflanzen widerstandsfähiger."];
+const GUIDE=[
+ {id:"g-kraut",title:"Kraut- und Braunfäule",sci:"Phytophthora infestans",aff:["Tomaten"],ill:leafSvg(SPOTS.blight),
+  short:"Grosse, unregelmässige braune Flecken, breitet sich bei Nässe in Tagen aus.",
+  photos:[[IMG.blight,"Flecken auf dem Blatt"],[IMG.blightLeaf,"Blatt mit Krautfäule"],[IMG.blightFruit,"Braunfäule an der Frucht"]],
+  sec:[["Erkennen",["Grosse, unregelmässige graugrüne bis braune Flecken, oft vom Blattrand her.","Bei feuchtem Wetter weisser Pilzrasen auf der Blattunterseite.","Braune Stellen am Stängel; Früchte mit hart-braunen, eingesunkenen Stellen."]],
+   ["Begünstigt durch",["Blätter, die über Stunden nass sind: Regen, Tau, Giessen übers Laub.","Kühle, feuchte Nächte; Kartoffeln in der Nähe."]],
+   ["Vorbeugen",["PhR-Sorten (Toleranz, kein Schutz).","Nur am Boden giessen, morgens.","Untere Blätter auf 30–40 cm entfernen, mulchen, 60–70 cm Abstand.","Keine Kartoffeln in der Nähe. Stäbe und Schnüre reinigen.","Ohne Dach: bei angesagter Regenperiode eine Tomatenhaube aus Folie überstülpen, unten offen lassen."]],
+   ["Bei Befall",["Befallene Blätter sofort entfernen, danach Hände waschen.","Stark befallene Pflanzen ganz entfernen. Alles in den Kehricht, nicht auf den Kompost.","Gesunde Früchte ernten und drinnen nachreifen lassen."]]]},
+ {id:"g-duerr",title:"Dürrfleckenkrankheit",sci:"Alternaria solani",aff:["Tomaten"],ill:leafSvg(SPOTS.alt),
+  short:"Runde Flecken mit Ringen wie eine Zielscheibe, von unten nach oben.",
+  photos:[[IMG.alt,"Zielscheiben-Flecken auf dem Blatt"]],
+  sec:[["Erkennen",["Runde, dunkelbraune Flecken mit konzentrischen Ringen, oft mit gelbem Rand.","Beginnt an den unteren, älteren Blättern und wandert nach oben.","Die Blätter vergilben, vertrocknen und fallen ab."]],
+   ["Begünstigt durch",["Wärme mit Wechsel von trockenen Tagen und Tau in der Nacht.","Gestresste, schlecht ernährte Pflanzen; ausgelaugte Erde; Erdspritzer aufs Laub."]],
+   ["Vorbeugen",["Gleichmässig giessen und regelmässig düngen.","Dick mulchen, untere Blätter entfernen.","Hochbeet-Erde erneuern. Schachtelhalmbrühe spritzen.","Wichtig: PhR schützt nicht gegen diese Krankheit."]],
+   ["Bei Befall",["Befallene Blätter laufend entfernen, in den Kehricht.","Pflanze stärken: gleichmässig giessen, düngen. Die Früchte bleiben meist essbar."]]]},
+ {id:"g-milben",title:"Spinnmilben",sci:"Tetranychus urticae",aff:["Tomaten","Gurken","Paprika","Zucchini"],ill:leafSvg(SPOTS.mite),
+  short:"Feine helle Sprenkel, Blätter werden bronze, feine Gespinste.",
+  photos:[[IMG.mite,"Spinnmilben mit Gespinst (stark vergrössert)"]],
+  sec:[["Erkennen",["Feine helle Sprenkel auf der Blattoberseite.","Blätter werden gelblich-bronze, trocknen ein und fallen ab.","Feine Gespinste an Blattunterseiten und Triebspitzen. Die Milben selbst sind winzig (ca. 0,5 mm), mit Lupe sichtbar."]],
+   ["Begünstigt durch",["Hitze und trockene Luft, windgeschützte Ecken.","Trockenstress der Pflanzen."]],
+   ["Vorbeugen",["Gleichmässig giessen, mulchen.","Bei Hitze die Blattunterseiten morgens kurz abbrausen.","Wöchentlich die Unterseiten kontrollieren."]],
+   ["Bei Befall",["Stark befallene Blätter entfernen.","Mit kräftigem Wasserstrahl von unten abspritzen, mehrmals im Abstand von 2–3 Tagen.","Raubmilben (Phytoseiulus persimilis) einsetzen – im Gartenfachhandel bestellbar.","Notfalls ein Präparat mit Rapsöl oder Kaliseife (im Bio-Anbau zugelassen)."]]]},
+ {id:"g-echt",title:"Echter Mehltau",sci:"Podosphaera xanthii u. a.",aff:["Zucchini","Gurken"],ill:leafSvg(SPOTS.powdery),
+  short:"Weisser, mehlartiger, abwischbarer Belag auf der Blattoberseite.",
+  photos:[[IMG.powdery,"Weisser Belag auf Zucchiniblatt"]],
+  sec:[["Erkennen",["Weisser, mehlartiger Belag auf der Blattoberseite, lässt sich abwischen.","Zuerst einzelne Flecken, später ganze Blätter. Diese werden gelb-braun und trocknen ein."]],
+   ["Begünstigt durch",["Warme, trockene Tage mit feuchten Nächten. Typisch ab Juli/August.","Trockenstress, dichter Stand."]],
+   ["Vorbeugen",["Tolerante Sorten wie 'Soleil'.","Wöchentlich Milch mit Wasser (1:9) spritzen, morgens.","Gleichmässig giessen, genug Abstand.","Im Juni nachsäen, damit im August junge, gesunde Pflanzen übernehmen."]],
+   ["Bei Befall",["Befallene Blätter abschneiden, in den Kehricht.","Weiter mit Milch spritzen oder ein Präparat mit Kaliumhydrogencarbonat (im Bio-Anbau zugelassen)."]]]},
+ {id:"g-falsch",title:"Falscher Mehltau",sci:"Pseudoperonospora cubensis",aff:["Gurken"],ill:leafSvg(SPOTS.downy),
+  short:"Gelbe, eckige Flecken oben, grau-violetter Belag unten.",
+  photos:[[IMG.downy,"Eckige Flecken auf Gurkenblatt"],[IMG.downy2,"Falscher Mehltau"]],
+  sec:[["Erkennen",["Gelbe, eckige Flecken auf der Oberseite, von den Blattadern begrenzt.","Auf der Unterseite ein grau-violetter Pilzrasen.","Die Flecken werden braun, die Blätter sterben schnell ab – von alt nach jung."]],
+   ["Begünstigt durch",["Nasse Blätter, Tau in kühlen Nächten, hohe Luftfeuchtigkeit. Typisch im Spätsommer."]],
+   ["Vorbeugen",["Tolerante Sorten wie Marketmore.","Senkrecht an Gitter oder Schnur ziehen.","Morgens am Boden giessen, genug Abstand.","Im Juni nachsäen."]],
+   ["Bei Befall",["Befallene Blätter sofort entfernen, in den Kehricht.","Nicht über die Blätter giessen. Milch hilft hier kaum."]]]}
+];
+const TIPS=[
+ {id:"t-pap",title:"Paprika früher zum Tragen bringen",ill:pepSvg("#4E8A2E",true),img:IMG.padron,short:"Licht, Wärme, Hitzeschutz und die richtigen Sorten.",
+  sec:[["Anzucht",["Aussaat Mitte Februar reicht – entscheidend ist das Licht: Pflanzenlampe mit 14–16 Stunden pro Tag.","Heizmatte bei 25–28 °C für die Keimung, danach 20–22 °C."]],
+   ["Auspflanzen",["Erst Ende Mai, wenn der Boden über 15 °C hat. Kalter Boden lässt Paprika wochenlang stillstehen.","Sonnigster Platz, keine Zucchini oder Tomaten daneben, die Schatten werfen."]],
+   ["Im Sommer",["Königsblüte ausbrechen.","Über 30 °C werfen Paprika Blüten ab: über Mittag beschatten, dick mulchen, gleichmässig giessen.","Kalibetont und mit wenig Stickstoff düngen."]],
+   ["Sorten und Überwintern",["Padrón, Marconi und Corno di Toro tragen früher als Blockpaprika.","Blocksorten in grossen Töpfen an eine warme Südwand.","Überwinterte Pflanzen (hell, 10–15 °C) tragen im nächsten Jahr viel früher."]]]},
+ {id:"t-erde",title:"Altes Hochbeet auffrischen",ill:sprout(),short:"Nach über 10 Jahren: Erde erneuern statt nur nachfüllen.",
+  sec:[["Warum",["Die Erde ist ausgelaugt und abgesackt, die Struktur verdichtet.","Pilzsporen und Schädlinge sammeln sich an, weil jedes Jahr ähnliche Pflanzen dort stehen."]],
+   ["So geht's (Oktober/November)",["Die oberen 30–40 cm abtragen, alte Erde auf Rasen oder Rabatten verteilen (nicht wieder ins Gemüsebeet).","Mit frischer Hochbeet- oder Gemüseerde und reifem Kompost auffüllen.","Wenn das Holz morsch oder die Füllung stark zusammengefallen ist: komplett neu befüllen (unten Äste, dann Laub, dann Kompost und Erde)."]],
+   ["Danach",["Jedes Frühjahr 3–5 cm Kompost obenauf.","Beetplan führen, damit Tomaten nicht jedes Jahr an derselben Stelle stehen."]]]},
+ {id:"t-begriffe",title:"PhR, F1, samenfest – was heisst das?",ill:sprout(),short:"Die Angaben auf deinen Samentüten kurz erklärt.",
+  sec:[["Begriffe",["<b>PhR:</b> hohe Toleranz gegen Kraut- und Braunfäule. Die Krankheit kommt später und schwächer, ganz verhindern kann die Sorte sie nicht.","<b>F1:</b> Hybridsorte, sehr einheitlich und wüchsig. Eigene Samen ergeben keine sortenechten Pflanzen.","<b>Samenfest:</b> Samen aus eigenen Früchten ergeben wieder dieselbe Sorte.","<b>Mehltau-Resistenz/Toleranz:</b> weniger und späterer Befall, aber kein vollständiger Schutz."]]]}
+];
+
 /* ---- Zustand ---- */
 const CATS=["Sträucher","Rosen","Beeren","Palmen & Exoten","Stauden","Sommerblumen","Allgemein"];
+const BEDS={
+ blumen:{name:"Blumenbeet",hash:"blumenbeet",plants:PLANTS,cats:CATS,pre:"gk",order:["w","s","d","p","g","k"],bloomLbl:"Blüht jetzt"},
+ hoch:{name:"Hochbeet",hash:"hochbeet",plants:VEG,cats:VCATS,pre:"hb",order:["a","p","s","d","g","k","e","w"],bloomLbl:"Ernte jetzt"}};
+const ALL=PLANTS.concat(VEG);
 const now=new Date(); const CUR=now.getMonth()+1; const YEAR=now.getFullYear();
-let month=CUR, view="month", cat="Alle", openId=null, sheetId=null;
+let bed=null, month=CUR, view="month", cat="Alle", openId=null, sheetId=null;
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true}catch(e){return false}}};
-{const v=store.get("gk-view"); if(v==="plants"||v==="dis") view=v;}
-const sc=store.get("gk-cat"); if(sc&&(sc==="Alle"||CATS.includes(sc))) cat=sc;
+const B=()=>BEDS[bed];
 const $=id=>document.getElementById(id);
 const tc=t=>`var(${TYPES[t].c})`;
 const label=p=>p.name+(p.bot?`, ${p.bot}`:"");
-const sorte=p=>p.sorte?`<span class="sorte">${esc(p.sorte)}</span>`:"";
 const cnt=p=>p.n?`${p.n}×`:"";
 const photo=id=>store.get("gk-photo-"+id);
-const picHTML=(p,cls="pic")=>{const ph=photo(p.id);return `<span class="${cls}">${ph?`<img src="${ph}" alt="Foto ${esc(label(p))}">`:(PIC[p.id]||"")}</span>`};
-
-function tasksFor(m){
-  const out=[];
-  PLANTS.forEach(p=>p.tasks.forEach((t,i)=>{ if(t[0].includes(m)) out.push({p,type:t[1],text:t[2],key:`gk-${YEAR}-${m}-${p.id}-${i}`}); }));
-  return out;
-}
+const picHTML=(p,cls="pic")=>{const ph=photo(p.id);return `<span class="${cls}">${PIC[p.id]||""}${ph?`<img src="${ph}" alt="Foto ${esc(label(p))}">`:imgTag(p.img,label(p))}</span>`};
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 
+function loadBedState(){
+  const b=B(); month=CUR; openId=null;
+  const v=store.get(b.pre+"-view"); view=(v==="plants"||(v==="guide"&&bed==="hoch")||(v==="dis"&&bed==="blumen"))?v:"month";
+  const c=store.get(b.pre+"-cat"); cat=(c&&(c==="Alle"||b.cats.includes(c)))?c:"Alle";
+}
+function tasksFor(m,b=B()){
+  const out=[];
+  b.plants.forEach(p=>p.tasks.forEach((t,i)=>{ if(t[0].includes(m)) out.push({p,type:t[1],text:t[2],key:`${b.pre}-${YEAR}-${m}-${p.id}-${i}`}); }));
+  return out;
+}
+
+/* ---- Startseite ---- */
+function renderHome(){
+  $("homeDate").textContent=`${MON[CUR-1]} ${YEAR}`;
+  const mos=(b)=>b==="blumen"
+    ?["rose","echi","hortensie","geranium"].map(id=>`<span>${PIC[id]}</span>`).join("")
+    :[["v-tom",IMG.tomato],["v-gur",IMG.cucumber],["v-zuc",IMG.zucchini],["v-pap",IMG.bell]].map(([id,f])=>`<span>${PIC[id]}${imgTag(f,"")}</span>`).join("");
+  $("tiles").innerHTML=Object.entries(BEDS).map(([k,b])=>{
+    const ts=tasksFor(CUR,b), open=ts.filter(t=>!store.get(t.key)).length;
+    const info=k==="blumen"?`${PLANTS.reduce((a,p)=>a+(p.n||0),0)}+ Pflanzen · Stauden, Sträucher, Palmen`:`Tomaten, Gurken, Zucchini, Paprika · Krankheiten & Tipps`;
+    return `<button type="button" class="tile" data-bed="${k}"><span class="mosaic" aria-hidden="true">${mos(k)}</span><span class="tile-body"><h2>${b.name}</h2><span class="meta">${info}</span><span class="meta">${MON[CUR-1]}: ${open?`${open} von ${ts.length} Aufgaben offen`:`alles erledigt`}</span><span class="go">Öffnen ›</span></span></button>`;
+  }).join("");
+}
+
+/* ---- Monatsansicht ---- */
 function renderMonths(){
   $("months").innerHTML=MS.map((m,i)=>{
     const mm=i+1, ts=tasksFor(mm), done=ts.filter(t=>store.get(t.key)).length;
@@ -527,21 +803,23 @@ function renderMonths(){
   }).join("");
 }
 function renderMonth(){
-  const ts=tasksFor(month);
+  const b=B(), ts=tasksFor(month);
   $("title").textContent=MON[month-1];
-  const blooming=PLANTS.filter(p=>p.bloom.includes(month));
-  $("bloom").innerHTML=`<span class="lbl">Blüht jetzt</span>`+(blooming.length?blooming.map(p=>`<button type="button" class="chip" data-open="${p.id}">${esc(label(p))}</button>`).join(""):`<span style="color:var(--muted)">nichts – Ruhezeit</span>`);
+  const hl=bed==="hoch"?b.plants.filter(p=>p.tasks.some(t=>t[1]==="e"&&t[0].includes(month))):b.plants.filter(p=>p.bloom.includes(month));
+  $("bloom").innerHTML=`<span class="lbl">${b.bloomLbl}</span>`+(hl.length?hl.map(p=>`<button type="button" class="chip" data-open="${p.id}">${esc(p.name)}</button>`).join(""):`<span style="color:var(--muted)">${bed==="hoch"?"nichts":"nichts – Ruhezeit"}</span>`);
   const done=ts.filter(t=>store.get(t.key)).length;
   $("sub").textContent=`${ts.length} Aufgaben in diesem Monat`;
   $("progTxt").textContent=`${done} von ${ts.length} erledigt`;
   $("progBar").style.width=(ts.length?done/ts.length*100:0)+"%";
   if(!ts.length){$("groups").innerHTML=`<div class="empty">In diesem Monat gibt es nichts zu tun.</div>`;return}
-  $("groups").innerHTML=ORDER.filter(t=>ts.some(x=>x.type===t)).map(t=>{
+  $("groups").innerHTML=b.order.filter(t=>ts.some(x=>x.type===t)).map(t=>{
     const list=ts.filter(x=>x.type===t);
     return `<div class="group" style="--tc:${tc(t)}"><h2><span class="dot"></span>${TYPES[t].n} <small>${list.length}</small></h2>`+
-      list.map(x=>{const d=!!store.get(x.key);return `<div class="task${d?' done':''}"><label class="chk" title="Erledigt"><input type="checkbox" id="${x.key}" data-k="${x.key}" aria-label="Erledigt: ${esc(label(x.p))}"${d?' checked':''}></label><button type="button" class="open" data-open="${x.p.id}">${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span>${x.p.sorte?`<br><span class="sorte">${esc(x.p.sorte)}</span>`:""}<br><span class="what">${esc(x.text)}</span><span class="more">Jahresübersicht ›</span></span></button></div>`}).join("")+`</div>`;
+      list.map(x=>{const d=!!store.get(x.key);return `<div class="task${d?' done':''}"><label class="chk" title="Erledigt"><input type="checkbox" id="${x.key}" data-k="${x.key}" aria-label="Erledigt: ${esc(label(x.p))}"${d?' checked':''}></label><button type="button" class="open" data-open="${x.p.id}">${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span>${x.p.sorte?`<br><span class="sorte">${esc(x.p.sorte)}</span>`:""}<br><span class="what">${esc(x.text)}</span><span class="more">${bed==="hoch"?"Sorten & Jahresübersicht ›":"Jahresübersicht ›"}</span></span></button></div>`}).join("")+`</div>`;
   }).join("");
 }
+
+/* ---- Pflanzen ---- */
 function yearRows(p){
   const rows=[];
   for(let mm=1;mm<=12;mm++){
@@ -551,51 +829,92 @@ function yearRows(p){
   }
   return rows.join("");
 }
+function varsHTML(p){
+  if(!p.vars) return "";
+  const good=["PhR","Mehltau-Resistenz","früh","samenfest"];
+  return `<h3>Deine Sorten</h3><ul class="vlist">${p.vars.map(v=>`<li><span class="vdot" style="--vc:${v.c}"></span><div><div class="vn">${esc(v.n)}</div><div class="vt">${esc(v.t)}</div>${v.tags?`<div class="tags" style="margin-top:4px">${v.tags.map(t=>`<span class="tag${good.includes(t)?" good":""}">${esc(t)}</span>`).join("")}</div>`:""}</div></li>`).join("")}</ul>`+
+    (p.tips?`<ul class="tips">${p.tips.map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`:"");
+}
 function plantDetail(p,pre){
   const has=!!photo(p.id);
   return `<div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="${pre}-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="${pre}-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
-      ${(PDIS[p.id]||[]).length?`<h3>Häufige Krankheiten &amp; Schädlinge</h3><div class="dlist">${PDIS[p.id].map(k=>disHTML(k,false)).join("")}</div>`:""}<h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul>`;
+      ${varsHTML(p)}${(PDIS[p.id]||[]).length?`<h3>Häufige Krankheiten &amp; Schädlinge</h3><div class="dlist">${PDIS[p.id].map(k=>disHTML(k,false)).join("")}</div>`:""}<h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul>`;
 }
 function openSheet(id){
-  const p=PLANTS.find(x=>x.id===id); if(!p) return;
+  const p=ALL.find(x=>x.id===id); if(!p) return;
   sheetId=id;
   $("sheetBody").innerHTML=`<div class="ph"><div style="min-width:0"><div class="pname" style="font-size:18px">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.sorte?`<div class="pbot">${esc(p.sorte)}</div>`:""}</div></div>`+plantDetail(p,"sh");
   $("sheet").hidden=false; document.body.style.overflow="hidden"; $("sheetClose").focus();
 }
 function closeSheet(){ $("sheet").hidden=true; sheetId=null; document.body.style.overflow=""; }
 function renderPlants(){
-  $("title").textContent="Meine Pflanzen";
-  $("sub").textContent="Pflanzenart wählen, dann Pflanze antippen für die Jahresübersicht";
-  const counts={}; PLANTS.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
-  $("filters").innerHTML=["Alle",...CATS].map(c=>`<button class="btn" data-cat="${c}" aria-pressed="${c===cat}">${c} <span class="fc">${c==="Alle"?PLANTS.length:counts[c]||0}</span></button>`).join("");
-  $("legend").innerHTML=`<span><i class="b"></i>Blütezeit</span>`+ORDER.map(t=>`<span style="--tc:${tc(t)}"><i></i>${TYPES[t].n}</span>`).join("");
-  const list=PLANTS.filter(p=>cat==="Alle"||p.cat===cat).sort((a,b)=>CATS.indexOf(a.cat)-CATS.indexOf(b.cat));
+  const b=B();
+  $("title").textContent=bed==="hoch"?"Mein Gemüse":"Meine Pflanzen";
+  $("sub").textContent=bed==="hoch"?"Gemüse antippen für Sorten und Jahresübersicht":"Pflanzenart wählen, dann Pflanze antippen für die Jahresübersicht";
+  const counts={}; b.plants.forEach(p=>counts[p.cat]=(counts[p.cat]||0)+1);
+  $("filters").hidden=bed==="hoch";
+  $("filters").innerHTML=["Alle",...b.cats].map(c=>`<button class="btn" data-cat="${c}" aria-pressed="${c===cat}">${c} <span class="fc">${c==="Alle"?b.plants.length:counts[c]||0}</span></button>`).join("");
+  const used=b.order.filter(t=>b.plants.some(p=>p.tasks.some(x=>x[1]===t)));
+  $("legend").innerHTML=(bed==="hoch"?"":`<span><i class="b"></i>Blütezeit</span>`)+used.map(t=>`<span style="--tc:${tc(t)}"><i></i>${TYPES[t].n}</span>`).join("");
+  const c=bed==="hoch"?"Alle":cat;
+  const list=b.plants.filter(p=>c==="Alle"||p.cat===c).sort((x,y)=>b.cats.indexOf(x.cat)-b.cats.indexOf(y.cat));
   let lastCat="";
   $("plist").innerHTML=list.map(p=>{
     let head="";
-    if(cat==="Alle"&&p.cat!==lastCat){lastCat=p.cat; head=`<div class="cat" style="margin-top:8px">${p.cat}</div>`;}
-    const year=MS.map((m,i)=>{const mm=i+1;const types=ORDER.filter(t=>p.tasks.some(x=>x[1]===t&&x[0].includes(mm)));
+    if(c==="Alle"&&bed!=="hoch"&&p.cat!==lastCat){lastCat=p.cat; head=`<div class="cat" style="margin-top:8px">${p.cat}</div>`;}
+    const year=MS.map((m,i)=>{const mm=i+1;const types=b.order.filter(t=>p.tasks.some(x=>x[1]===t&&x[0].includes(mm)));
       return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===CUR?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
-    const has=!!photo(p.id);
     return head+`<details class="plant" data-id="${p.id}"${p.id===openId?' open':''}><summary><div class="ph">${picHTML(p)}<div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.sorte?`<div class="pbot">${esc(p.sorte)}</div>`:""}</div></div><div class="year">${year}</div></summary>
       <div class="pbody">${plantDetail(p,"ph")}</div></details>`;
   }).join("");
 }
+
 function renderDis(){
   $("title").textContent="Krankheiten";
   $("sub").textContent="Pilze und Schädlinge erkennen und richtig behandeln";
   const keys=Object.keys(DIS).map(k=>[k,PLANTS.filter(p=>(PDIS[p.id]||[]).includes(k)).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1]);
   $("dlist").innerHTML=keys.map(([k])=>disHTML(k,true)).join("");
 }
+
+/* ---- Ratgeber ---- */
+function gcard(g){
+  const photos=(g.photos||(g.img?[[g.img,""]]:[]));
+  const thumb=`<span class="gthumb">${g.ill}${photos[0]?imgTag(photos[0][0],g.title):""}</span>`;
+  const gal=g.photos?`<div class="gphotos">${g.photos.map(([f,cap])=>`<figure><span class="gimg">${g.ill}${imgTag(f,cap)}</span><figcaption>${esc(cap)} · <a class="credit" href="${CMP(f)}" target="_blank" rel="noopener">Foto: Wikimedia Commons</a></figcaption></figure>`).join("")}</div>`:"";
+  return `<details class="gcard" data-id="${g.id}"><summary>${thumb}<span><span class="gtitle">${esc(g.title)}</span>${g.sci?`<br><span class="gsci">${esc(g.sci)}</span>`:""}<div class="gshort">${esc(g.short)}</div>${g.aff?`<div class="tags" style="margin-top:6px">${g.aff.map(a=>`<span class="tag">${esc(a)}</span>`).join("")}</div>`:""}<span class="more">Mehr ›</span></span></summary>
+   <div class="gbody">${gal}${g.sec.map(([h,items],i)=>`<div class="gsec${h==="Bei Befall"?" act":""}"><h4>${esc(h)}</h4><ul>${items.map(t=>`<li>${t}</li>`).join("")}</ul></div>`).join("")}</div></details>`;
+}
+function renderGuide(){
+  $("title").textContent="Ratgeber";
+  $("sub").textContent="Krankheiten erkennen, vorbeugen, behandeln";
+  $("guideView").innerHTML=`<div class="verdict"><h3>Dein Sommer 2026 – was vermutlich los war</h3><ul>${VERDICT.map(v=>`<li>${v}</li>`).join("")}</ul></div>
+   <h2 class="gh">Krankheiten & Schädlinge</h2>${GUIDE.map(gcard).join("")}
+   <h2 class="gh">Tipps</h2>${TIPS.map(gcard).join("")}`;
+}
+
+/* ---- Steuerung ---- */
 function render(){
+  document.documentElement.dataset.bed=bed||"home";
+  $("home").hidden=!!bed; $("bedApp").hidden=!bed;
+  if(!bed){renderHome();return}
+  const b=B();
+  $("bedName").textContent=b.name;
+  $("plantTotal").textContent=bed==="hoch"?`${VEG.reduce((a,p)=>a+(p.n||0),0)} Sorten`:`${PLANTS.reduce((a,p)=>a+(p.n||0),0)}+ Pflanzen`;
+  $("vGuide").hidden=bed!=="hoch"; $("vDis").hidden=bed!=="blumen";
+  $("vDis").setAttribute("aria-pressed",view==="dis");
   $("vMonth").setAttribute("aria-pressed",view==="month");
   $("vPlants").setAttribute("aria-pressed",view==="plants");
-  $("vDis").setAttribute("aria-pressed",view==="dis");
-  $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants"; $("disView").hidden=view!=="dis";
+  $("vPlants").textContent=bed==="hoch"?"Gemüse":"Pflanzen";
+  $("vGuide").setAttribute("aria-pressed",view==="guide");
+  $("monthView").hidden=view!=="month"; $("plantView").hidden=view!=="plants"; $("guideView").hidden=view!=="guide"; $("disView").hidden=view!=="dis";
   $("months").hidden=view!=="month";
+  $("bedFoot").textContent="Angaben für das Schweizer Mittelland (Winterhärtezone ca. 7b–8a). In höheren Lagen alles 1–3 Wochen später. Abgehakte Aufgaben werden nur in diesem Browser gespeichert."+(bed==="hoch"?" Fotos: Wikimedia Commons, Lizenzen siehe jeweiliger Link.":"");
   renderMonths();
-  view==="month"?renderMonth():view==="plants"?renderPlants():renderDis();
+  view==="month"?renderMonth():view==="plants"?renderPlants():view==="dis"?renderDis():renderGuide();
 }
+function setView(v){view=v;store.set(B().pre+"-view",v);render()}
+function fromHash(){const h=location.hash.slice(1);return Object.keys(BEDS).find(k=>BEDS[k].hash===h)||null}
+function route(){const nb=fromHash(); if(nb!==bed){if(sheetId)closeSheet();bed=nb;if(bed)loadBedState();render();window.scrollTo(0,0)}}
 function addPhoto(id,file){
   const url=URL.createObjectURL(file), img=new Image();
   img.onload=()=>{const s=320,c=document.createElement("canvas");c.width=c.height=s;const m=Math.min(img.naturalWidth,img.naturalHeight);
@@ -605,6 +924,9 @@ function addPhoto(id,file){
   img.onerror=()=>URL.revokeObjectURL(url);
   img.src=url;
 }
+$("tiles").addEventListener("click",e=>{const t=e.target.closest("[data-bed]");if(t)location.hash=BEDS[t.dataset.bed].hash});
+$("backHome").onclick=()=>{location.hash="start"};
+window.addEventListener("hashchange",route);
 $("months").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;month=+b.dataset.m;render()});
 document.addEventListener("click",e=>{const o=e.target.closest("[data-open]");if(o){e.preventDefault();openSheet(o.dataset.open)}});
 $("sheet").addEventListener("click",e=>{if(e.target.id==="sheet")closeSheet();const b=e.target.closest("[data-rm]");if(b){e.preventDefault();store.set("gk-photo-"+b.dataset.rm,"");render();openSheet(b.dataset.rm)}});
@@ -612,14 +934,15 @@ $("sheet").addEventListener("change",e=>{const id=e.target.dataset.photo;if(id&&
 $("sheetClose").onclick=closeSheet;
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&sheetId)closeSheet()});
 $("groups").addEventListener("change",e=>{const k=e.target.dataset.k;if(!k)return;store.set(k,e.target.checked?"1":"");renderMonths();renderMonth()});
-$("filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.cat;store.set("gk-cat",cat);openId=null;renderPlants()});
+$("filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.cat;store.set(B().pre+"-cat",cat);openId=null;renderPlants()});
 $("plist").addEventListener("toggle",e=>{const d=e.target;if(d.tagName!=="DETAILS")return;if(d.open)openId=d.dataset.id;else if(openId===d.dataset.id)openId=null},true);
 $("plist").addEventListener("change",e=>{const id=e.target.dataset.photo;if(id&&e.target.files[0])addPhoto(id,e.target.files[0])});
 $("plist").addEventListener("click",e=>{const b=e.target.closest("[data-rm]");if(!b)return;e.preventDefault();store.set("gk-photo-"+b.dataset.rm,"");openId=b.dataset.rm;render()});
-$("vMonth").onclick=()=>{view="month";store.set("gk-view","month");render()};
-$("vPlants").onclick=()=>{view="plants";store.set("gk-view","plants");render()};
-$("vDis").onclick=()=>{view="dis";store.set("gk-view","dis");render()};
-$("plantTotal").textContent=PLANTS.reduce((a,p)=>a+(p.n||0),0)+"+";
+$("vMonth").onclick=()=>setView("month");
+$("vPlants").onclick=()=>setView("plants");
+$("vGuide").onclick=()=>setView("guide");
+$("vDis").onclick=()=>setView("dis");
+bed=fromHash(); if(bed) loadBedState();
 render();
 if("serviceWorker" in navigator){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 </script>
