@@ -88,7 +88,7 @@ details.plant summary{list-style:none;cursor:pointer;padding:12px 14px;display:g
 details.plant summary::-webkit-details-marker{display:none}
 .pname{font-weight:600}
 .pname .n{font-variant-numeric:tabular-nums;color:var(--accent);margin-right:6px}
-.pbot{font-size:13px;color:var(--muted);font-style:italic}
+.pbot,.sorte{font-size:13px;color:var(--muted)}
 .cat{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
 .year{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
 .year div{display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -224,10 +224,8 @@ const PLANTS=[
   [[6,7,8],"g","Bei Hitze morgens durchdringend giessen. Hortensien brauchen viel Wasser."],
   [[7,8],"k","Auf Mehltau (weisser Belag) und Blattläuse achten."],
   [[10,11],"g","Verblühte Blütenbälle als Winterschmuck stehen lassen, erst im März schneiden."]]},
- {id:"hib1",name:"Hibiskus",sorte:"gross, weiss",bot:"Hibiscus",n:1,cat:"Sträucher",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
- {id:"hib2",name:"Hibiskus",sorte:"klein",bot:"Hibiscus",n:1,cat:"Sträucher",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
- {id:"rose1",name:"Rose",sorte:"hoch",bot:"Rosa",n:1,cat:"Rosen",bloom:[6,7,8,9],tasks:ROSE},
- {id:"rose2",name:"Rose",sorte:"niedrig",bot:"Rosa",n:1,cat:"Rosen",bloom:[6,7,8,9],tasks:ROSE},
+ {id:"hib",name:"Hibiskus",sorte:"gross weiss, klein",bot:"Hibiscus syriacus",n:2,cat:"Sträucher",bloom:[7,8,9],note:HIB_NOTE,tasks:HIBISKUS},
+ {id:"rose",name:"Rose",sorte:"hoch, niedrig",bot:"Rosa",n:2,cat:"Rosen",bloom:[6,7,8,9],tasks:ROSE},
  {id:"johb",name:"Johannisbeere",sorte:"",bot:"Ribes",n:1,cat:"Beeren",bloom:[4],tasks:[
   [[2],"s","Falls im Sommer nicht geschnitten: jetzt älteste Triebe bodennah entfernen."],
   [[3],"d","Kompost oder Beerendünger rund um den Strauch verteilen."],
@@ -245,8 +243,7 @@ const PLANTS=[
   [[10],"w","Material für den Winterschutz bereitlegen: Laub, Stroh, Vlies, Jute oder Drahtgitter."],
   [[11],"w","Nach dem ersten Frost Blätter abschneiden, Stämme einpacken (Drahtgitter mit Laub oder Stroh füllen, Vlies drum), Wurzelbereich 30–50 cm dick mulchen und oben vor Regen abdecken."],
   [[12,1,2],"k","Winterschutz nach Sturm und Schnee kontrollieren. Er muss trocken bleiben."]]},
- {id:"cham1",name:"Zwergpalme",sorte:"'Vulcano'",bot:"Chamaerops humilis",n:1,cat:"Palmen & Exoten",bloom:[],note:"'Vulcano' wächst kompakter und gilt als etwas frosthärter. "+CHAM_NOTE,tasks:CHAM},
- {id:"cham2",name:"Zwergpalme",sorte:"",bot:"Chamaerops humilis",n:1,cat:"Palmen & Exoten",bloom:[],note:CHAM_NOTE,tasks:CHAM},
+ {id:"cham",name:"Zwergpalme",sorte:"'Vulcano' und Wildform",bot:"Chamaerops humilis",n:2,cat:"Palmen & Exoten",bloom:[],note:"'Vulcano' wächst kompakter und gilt als etwas frosthärter. "+CHAM_NOTE,tasks:CHAM},
  {id:"trachy",name:"Hanfpalme",sorte:"'Frosty'",bot:"Trachycarpus fortunei",n:2,cat:"Palmen & Exoten",bloom:[],note:"Hanfpalmen sind die frosthärtesten Gartenpalmen. Ältere, eingewachsene Exemplare brauchen meist keinen Winterschutz mehr.",tasks:[
   [[3],"w","Vlies entfernen."],
   [[4,5],"s","Braune, hängende Wedel am Stamm abschneiden, einen kurzen Stummel lassen."],
@@ -254,9 +251,7 @@ const PLANTS=[
   [[7,8],"g","Bei Trockenheit durchdringend giessen."],
   [[11],"w","Wurzelbereich mulchen. Junge Pflanzen: bei starkem Frost (unter ca. −12 °C) Wedel zusammenbinden und Vlies drüber."],
   [[12,1,2],"g","Schwere Schneelast von den Wedeln abschütteln."]]},
- {id:"echi1",name:"Sonnenhut",sorte:"weiss",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],tasks:ECHI},
- {id:"echi2",name:"Sonnenhut",sorte:"orange",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],note:"Farbige Sorten sind oft kurzlebiger. Staunässe im Winter unbedingt vermeiden.",tasks:ECHI},
- {id:"echi3",name:"Sonnenhut",sorte:"rosa",bot:"Echinacea",n:2,cat:"Stauden",bloom:[7,8,9],tasks:ECHI},
+ {id:"echi",name:"Sonnenhut",sorte:"weiss, orange, rosa (je 2)",bot:"Echinacea",n:6,cat:"Stauden",bloom:[7,8,9],note:"Farbige Sorten wie Orange sind oft kurzlebiger. Staunässe im Winter unbedingt vermeiden.",tasks:ECHI},
  {id:"geranium",name:"Storchschnabel",sorte:"'Rozanne'",bot:"Geranium",n:6,cat:"Stauden",bloom:[6,7,8,9,10],tasks:[
   [[3],"s","Alte Triebe bodennah abschneiden, falls nicht schon im Herbst gemacht."],
   [[4],"d","Kompost geben."],
@@ -304,7 +299,6 @@ const PLANTS=[
   [[4],"d","Kaum Dünger nötig, er mag magere Böden."],
   [[7],"s","Blütenstände nach der Blüte abschneiden, dann bleibt der silbrige Blattteppich schön."],
   [[11],"k","Nasse Blätter faulen leicht: Herbstlaub nicht darauf liegen lassen."]]},
- {id:"aster",name:"Aster",sorte:"Sorte unbekannt",bot:"Aster",n:2,cat:"Stauden",bloom:[8,9,10],note:"Pflege wie Herbstastern angenommen. Wenn du die Sorte kennst, kann ich die Angaben anpassen.",tasks:HERBSTASTER},
  {id:"herbstaster",name:"Herbstastern",sorte:"diverse",bot:"Aster / Symphyotrichum",n:null,cat:"Stauden",bloom:[8,9,10],tasks:HERBSTASTER},
  {id:"gaura",name:"Prachtkerze",sorte:"rosa",bot:"Gaura lindheimeri",n:1,cat:"Stauden",bloom:[6,7,8,9,10],note:"Nur bedingt winterhart und eher kurzlebig. Im Herbst nicht zurückschneiden.",tasks:[
   [[3],"w","Reisig und Laub entfernen."],
@@ -355,9 +349,9 @@ function stachys(p){let s=`<path d="M32 56 L32 12" stroke="#9AA596" stroke-width
 function gaura(p){let s=`<g stroke="${G}" stroke-width="1.6" fill="none"><path d="M32 64 Q28 40 18 14"/><path d="M32 64 Q34 36 42 10"/><path d="M32 64 Q38 44 52 28"/><path d="M32 64 Q26 50 12 40"/></g>`;const f=(x,y)=>{let r="";for(let i=0;i<4;i++)r+=`<ellipse cx="${x}" cy="${y-3}" rx="2" ry="3.4" fill="${p}" transform="rotate(${i*90+20} ${x} ${y})"/>`;return r};[[18,14],[42,10],[52,28],[12,40],[25,30],[38,26]].forEach(([x,y])=>s+=f(x,y));return W(s)}
 function pin(p){let s=`<ellipse cx="20" cy="52" rx="10" ry="4.5" fill="${G}" transform="rotate(20 20 52)"/><ellipse cx="44" cy="52" rx="10" ry="4.5" fill="${G}" transform="rotate(-20 44 52)"/>`;for(let i=0;i<5;i++)s+=`<path d="M32 30 C26 22 26 12 34 10 C40 12 38 22 32 30Z" fill="${p}" stroke="${SH}" stroke-width=".6" transform="rotate(${i*72} 32 30)"/>`;return W(s+`<circle cx="32" cy="30" r="3.6" fill="#FFFFFF"/><circle cx="32" cy="30" r="1.5" fill="#9E1F55"/>`)}
 function sprout(){return W(`<ellipse cx="32" cy="54" rx="20" ry="6" fill="#8A6A45"/><path d="M32 52 L32 26" stroke="${G}" stroke-width="3" stroke-linecap="round"/><ellipse cx="23" cy="26" rx="10" ry="5" fill="${G}" transform="rotate(-35 23 26)"/><ellipse cx="41" cy="20" rx="11" ry="5.5" fill="${G}" transform="rotate(30 41 20)"/>`)}
-const PIC={hortensie:ball(),hib1:hib("#FFFFFF","#B0284A"),hib2:hib("#B9A6E0","#7A2A6A"),rose1:rose("#D9416A","#8E1F3F"),rose2:rose("#E8718F","#A3304F"),johb:currant(),musa:banana(),cham1:fan("#7FA59A",false),cham2:fan("#5E9A4E",false),trachy:fan("#3F8A48",true),
- echi1:daisy("#F6F3EA","#C88A2A",14,15,7),echi2:daisy("#F08A3C","#6B3E1A",14,15,7),echi3:daisy("#E07AA8","#A8522A",14,15,7),geranium:gera("#6C63D6","#F1EEFF"),alpenaster:daisy("#E58BB8","#F2C230",22,11,5),glocke:bells("#6D4BC2"),
- helenium:daisy("#C2402C","#4F2E15",12,13,7),phlox:phlox("#E98BB9","#B03A7A"),liatris:spike("#9B4FC7"),stachys:stachys("#C77FB0"),aster:daisy("#8E7BE0","#F2C230",24,12,4.5),herbstaster:daisy("#A08CE8","#F2C230",24,12,4.5),
+const PIC={hortensie:ball(),hib:hib("#FFFFFF","#B0284A"),rose:rose("#D9416A","#8E1F3F"),johb:currant(),musa:banana(),cham:fan("#6FA08E",false),trachy:fan("#3F8A48",true),
+ echi:daisy("#E07AA8","#A8522A",14,15,7),geranium:gera("#6C63D6","#F1EEFF"),alpenaster:daisy("#E58BB8","#F2C230",22,11,5),glocke:bells("#6D4BC2"),
+ helenium:daisy("#C2402C","#4F2E15",12,13,7),phlox:phlox("#E98BB9","#B03A7A"),liatris:spike("#9B4FC7"),stachys:stachys("#C77FB0"),herbstaster:daisy("#A08CE8","#F2C230",24,12,4.5),
  gaura:gaura("#F2A9C9"),heliopsis:daisy("#F2B81C","#B9710F",14,14,6),catharanthus:pin("#E0559A"),celosia:plume("#D4283A"),allg:sprout()};
 
 /* ---- Zustand ---- */
@@ -369,7 +363,8 @@ if(store.get("gk-view")==="plants") view="plants";
 const sc=store.get("gk-cat"); if(sc&&(sc==="Alle"||CATS.includes(sc))) cat=sc;
 const $=id=>document.getElementById(id);
 const tc=t=>`var(${TYPES[t].c})`;
-const label=p=>p.name+(p.sorte?` ${p.sorte}`:"");
+const label=p=>p.name+(p.bot?`, ${p.bot}`:"");
+const sorte=p=>p.sorte?`<span class="sorte">${esc(p.sorte)}</span>`:"";
 const cnt=p=>p.n?`${p.n}×`:"";
 const photo=id=>store.get("gk-photo-"+id);
 const picHTML=(p,cls="pic")=>{const ph=photo(p.id);return `<span class="${cls}">${ph?`<img src="${ph}" alt="Foto ${esc(label(p))}">`:(PIC[p.id]||"")}</span>`};
@@ -401,7 +396,7 @@ function renderMonth(){
   $("groups").innerHTML=ORDER.filter(t=>ts.some(x=>x.type===t)).map(t=>{
     const list=ts.filter(x=>x.type===t);
     return `<div class="group" style="--tc:${tc(t)}"><h2><span class="dot"></span>${TYPES[t].n} <small>${list.length}</small></h2>`+
-      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}>${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span><br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
+      list.map(x=>{const d=!!store.get(x.key);return `<label class="task${d?' done':''}"><input type="checkbox" id="${x.key}" data-k="${x.key}"${d?' checked':''}>${picHTML(x.p)}<span class="txt"><span class="who">${esc(label(x.p))} <span>${cnt(x.p)}</span></span>${x.p.sorte?`<br><span class="sorte">${esc(x.p.sorte)}</span>`:""}<br><span class="what">${esc(x.text)}</span></span></label>`}).join("")+`</div>`;
   }).join("");
 }
 function yearRows(p){
@@ -427,7 +422,7 @@ function renderPlants(){
     const year=MS.map((m,i)=>{const mm=i+1;const types=ORDER.filter(t=>p.tasks.some(x=>x[1]===t&&x[0].includes(mm)));
       return `<div><span class="m">${m[0]}</span><span class="cell${p.bloom.includes(mm)?' bl':''}${mm===CUR?' cur':''}">${types.map(t=>`<i style="--tc:${tc(t)}"></i>`).join("")}</span></div>`}).join("");
     const has=!!photo(p.id);
-    return head+`<details class="plant" data-id="${p.id}"${p.id===openId?' open':''}><summary><div class="ph">${picHTML(p)}<div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.bot?`<div class="pbot">${esc(p.bot)}</div>`:""}</div></div><div class="year">${year}</div></summary>
+    return head+`<details class="plant" data-id="${p.id}"${p.id===openId?' open':''}><summary><div class="ph">${picHTML(p)}<div style="min-width:0"><div class="pname">${p.n?`<span class="n">${p.n}×</span>`:""}${esc(label(p))}</div>${p.sorte?`<div class="pbot">${esc(p.sorte)}</div>`:""}</div></div><div class="year">${year}</div></summary>
       <div class="pbody"><div class="ptop">${picHTML(p,"bigpic")}<div class="pmeta"><div class="cat">${p.cat}</div>${p.note?`<div class="note">${esc(p.note)}</div>`:""}<div class="photo-actions"><label class="btn" for="ph-${p.id}">${has?"Foto ändern":"Eigenes Foto hinzufügen"}</label><input type="file" accept="image/*" id="ph-${p.id}" data-photo="${p.id}" hidden>${has?`<button class="btn ghost" data-rm="${p.id}">Foto entfernen</button>`:""}</div></div></div>
       <h3>Jahresübersicht</h3><ul class="tl">${yearRows(p)}</ul></div></details>`;
   }).join("");
